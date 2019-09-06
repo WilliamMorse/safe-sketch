@@ -131,32 +131,76 @@ length ( ( x1, y1 ), ( x2, y2 ) ) =
     ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5
 
 
-normWithScaling : Float -> ( Point, Point ) -> Point
-normWithScaling smoothing pointPair =
+normWithScaling : Float -> Point -> ( Point, Point ) -> Point
+normWithScaling smoothing basePoint pointPair =
     let
         c =
             length pointPair
 
         ( ( x1, y1 ), ( x2, y2 ) ) =
             pointPair
+
+        ( x3, y3 ) =
+            basePoint
     in
-    ( (x2 - x1) * smoothing / c, (y2 - y1) * smoothing / c )
+    ( x3
+        + ((x2 - x1) * smoothing / c)
+    , y3
+        + ((y2 - y1) * smoothing / c)
+    )
+
+
+pointToString : Point -> String
+pointToString ( x1, y1 ) =
+    " "
+        ++ String.fromFloat x1
+        ++ " "
+        ++ String.fromFloat y1
+
+
+myS : Point -> Point -> String
+myS perce controll =
+    "S"
+        ++ pointToString perce
+        ++ pointToString controll
 
 
 points_to_smooth_svg_path : List Point -> Float -> String
 points_to_smooth_svg_path points smoothingFactor =
+    -- makes the args to the svg path command following this algo:
+    -- https://medium.com/@francoisromain/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
     let
-        gashiftedPoints =
+        -- these are the points with bezier controll points ascoceated with them
+        basePoints =
             List.drop 1 points
 
-        --  map2 will truncate the longer list will drop the last point because it dosen't make a pair
+        -- combined with the normal points we use these to define the tangents at each base point
+        gashiftedPoints =
+            List.drop 2 points
+
+        --  map2 will truncate the longer list
         pointPairs =
             List.map2 Tuple.pair points gashiftedPoints
 
-        relativeOffsetControllPoints =
-            List.map (normWithScaling smoothingFactor) pointPairs
+        bezierControllPoints =
+            List.map2 (normWithScaling smoothingFactor) basePoints pointPairs
+
+        firstPoint =
+            let
+                point =
+                    case List.head points of
+                        Just p ->
+                            p
+
+                        Nothing ->
+                            ( 0, 0 )
+            in
+            "M " ++ pointToString point
+
+        subsequentPoints =
+            List.map2 myS basePoints bezierControllPoints
     in
-    Debug.todo "incorperate the svg path command following this algo: https://medium.com/@francoisromain/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74"
+    String.join "\n" <| firstPoint :: subsequentPoints
 
 
 svgPointsToPolylineString : List Point -> String
