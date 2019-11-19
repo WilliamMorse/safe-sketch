@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), Point, alwaysPreventDefault, blockContextMenu, init, main, svgCanvas, update, view)
+module Main exposing (Model, Msg(..), Point, blockContextMenu, init, main, svgCanvas, update, view)
 
 import Browser
 import Browser.Dom exposing (Viewport)
@@ -44,6 +44,7 @@ type alias Model =
     , strokes : List (List Point)
     , viewportHeight : Float
     , viewportWidth : Float
+    , controlPoints : List (List Point)
     }
 
 
@@ -57,9 +58,12 @@ init =
       , pointerDown = False
       , offsetPos = ( 0, 0 )
       , lastStroke = []
-      , strokes = [ [] ]
+
+      -- hadcoded some starting strokes to test the smoothing
+      , strokes = [ [ ( 100, 100 ), ( 500, 500 ), ( 100, 600 ), ( 200, 600 ) ] ]
       , viewportHeight = 10
       , viewportWidth = 10
+      , controlPoints = [ [] ]
       }
     , Task.perform UpdateViewport Browser.Dom.getViewport
     )
@@ -145,50 +149,7 @@ blockContextMenu : Msg -> Html.Attribute Msg
 blockContextMenu msg =
     Html.Events.preventDefaultOn
         "contextmenu"
-        (D.map (\a -> ( a, True )) (D.succeed msg))
-
-
-alwaysPreventDefault : msg -> ( msg, Bool )
-alwaysPreventDefault msg =
-    ( msg, True )
-
-
-svgCanvas : Model -> Element Msg
-svgCanvas model =
-    let
-        width =
-            String.fromFloat <| model.viewportWidth - 40
-
-        height =
-            String.fromFloat <| model.viewportHeight - 40
-
-        halfWidth =
-            String.fromFloat ((model.viewportWidth - 40) / 2)
-
-        halfHeight =
-            String.fromFloat ((model.viewportHeight - 40) / 2)
-    in
-    html <|
-        S.svg
-            [ Sa.width width
-            , Sa.height height
-            , Sa.viewBox <|
-                ""
-                    ++ "-"
-                    ++ halfWidth
-                    ++ " "
-                    ++ "-"
-                    ++ halfHeight
-                    ++ halfWidth
-                    ++ " "
-                    ++ halfHeight
-            ]
-            (List.concat
-                [ [ stroke model.lastStroke
-                  ]
-                , List.map stroke model.strokes
-                ]
-            )
+        (D.map (\m -> ( m, True )) (D.succeed msg))
 
 
 view : Model -> Html Msg
@@ -237,44 +198,197 @@ svgPoint point =
         []
 
 
-length : ( Point, Point ) -> Float
-length ( ( x1, y1 ), ( x2, y2 ) ) =
-    -- just use some pythagoris
-    ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5
+add : Point -> Point -> Point
+add ( a1, a2 ) ( b1, b2 ) =
+    let
+        x =
+            a1 + b1
+
+        y =
+            a2 + b2
+    in
+    ( x, y )
+
+
+subtract : Point -> Point -> Point
+subtract ( a1, a2 ) ( b1, b2 ) =
+    let
+        x =
+            b1 - a1
+
+        y =
+            b2 - a2
+    in
+    ( x, y )
+
+
+multiply : Point -> Float -> Point
+multiply ( a1, a2 ) s =
+    ( s * a1, s * a2 )
+
+
+{-| Subtracts the second point from the first point vectorially
+-}
+dotProduct : Point -> Point -> Float
+dotProduct ( a1, a2 ) ( b1, b2 ) =
+    a1 * b1 + a2 * b2
+
+
+length2 : Point -> Float
+length2 ( a1, a2 ) =
+    a1 ^ 2 + a2 ^ 2
+
+
+length : Point -> Float
+length a =
+    length2 a ^ 0.5
+
+
+distanceBetween : Point -> Point -> Float
+distanceBetween a b =
+    length <| subtract a b
+
+
+{-| Finds the relative vector from a to b
+-}
+rel : Point -> Point -> Point
+rel a b =
+    subtract b a
+
+
+norm : Point -> Point
+norm a =
+    multiply a (length a ^ -1)
+
+
+norm2 : Point -> Point
+norm2 a =
+    multiply a (length2 a ^ -1)
+
+
+{-| Project a onto b and return a vector
+-}
+proj : Point -> Point -> Point
+proj a b =
+    multiply
+        b
+        (dotProduct a b / length2 b)
+
+
+projL : Point -> Point -> Float
+projL a b =
+    dotProduct a b / length b
+
+
+cubicControlPoints : Point -> Point -> Point -> ( Point, Point )
+cubicControlPoints pre base next =
+    let
+        smoothing =
+            0.4
+
+        a =
+            rel pre next
+                |> proj (rel pre base)
+                |> (\p -> multiply p smoothing)
+
+        b =
+            rel pre next
+                |> proj (rel next base)
+                |> (\p -> multiply p smoothing)
+    in
+    ( add base a, add base b )
+
+
+cubicSpline : List Point -> S.Svg Msg
+cubicSpline points =
+    let
+        basePoints =
+            List.drop 1 points
+
+        nextPoints =
+            List.drop 2 points
+
+        -- m starting point
+        -- S (curve to) second point2 + c1
+        -- C c2 c3 point 2
+        ( point1, tailPoints ) =
+            case points of
+                a :: b ->
+                    ( pointToString a, b )
+
+                [] ->
+                    ( "", [] )
+
+        ( cp2, cp1 ) =
+            List.map3 cubicControlPoints points basePoints nextPoints
+                |> List.unzip
+
+        c1 =
+            List.take 1 points ++ cp1
+
+        c2 =
+            cp2
+                |> List.reverse
+                |> (++) (List.take 1 (List.reverse tailPoints))
+                |> List.reverse
+
+        pathPointsString =
+            String.concat
+                [ "M" ++ point1
+                , "C"
+                , List.map3
+                    (\a b c ->
+                        pointToString a
+                            ++ pointToString b
+                            ++ pointToString c
+                    )
+                    c1
+                    c2
+                    tailPoints
+                    |> String.concat
+                ]
+    in
+    S.path
+        [ Sa.fill "none"
+        , Sa.stroke "blue"
+        , Sa.d pathPointsString
+        ]
+        []
 
 
 normWithScaling : Float -> Point -> ( Point, Point ) -> Point
-normWithScaling smoothing basePoint pointPair =
+normWithScaling smoothing basePoint ( a, b ) =
     let
         c =
-            length pointPair
+            distanceBetween a b
 
         ( ( x1, y1 ), ( x2, y2 ) ) =
-            pointPair
+            ( a, b )
 
         ( x3, y3 ) =
             basePoint
     in
     ( x3
-        + ((x2 - x1) * (smoothing * c))
+        - ((x2 - x1) * (smoothing * c / 900))
     , y3
-        + ((y2 - y1) * (smoothing * c))
+        - ((y2 - y1) * (smoothing * c / 900))
     )
 
 
 pointToString : Point -> String
 pointToString ( x1, y1 ) =
-    " "
+    ""
         ++ String.fromFloat x1
         ++ " "
         ++ String.fromFloat y1
+        ++ " "
 
 
 myS : Point -> Point -> String
-myS perce controll =
+myS perce control =
     "S"
+        ++ pointToString control
         ++ pointToString perce
-        ++ pointToString controll
 
 
 points_to_smooth_svg_path : List Point -> Float -> String
@@ -311,16 +425,27 @@ points_to_smooth_svg_path points smoothingFactor =
 
         subsequentPoints =
             List.map2 myS basePoints bezierControllPoints
+
+        lastPoint =
+            case List.reverse points of
+                [] ->
+                    ""
+
+                l :: _ ->
+                    -- finish the path with a zero length control point
+                    myS l l
     in
-    String.join " " <| firstPoint :: subsequentPoints
+    [ [ firstPoint ], subsequentPoints, [ lastPoint ] ]
+        |> List.concat
+        |> String.join " "
 
 
 smoothStroke : List Point -> S.Svg Msg
 smoothStroke points =
     S.path
         [ Sa.fill "none"
-        , Sa.stroke "black"
-        , Sa.d (points_to_smooth_svg_path points 0.05)
+        , Sa.stroke "green"
+        , Sa.d (points_to_smooth_svg_path points 1)
         ]
         []
 
@@ -341,8 +466,51 @@ stroke : List Point -> S.Svg Msg
 stroke points =
     S.polyline
         [ Sa.fill "none"
-        , Sa.stroke "black"
-        , Sa.strokeWidth "8"
+        , Sa.stroke "grey"
+        , Sa.strokeWidth "1"
         , Sa.points (svgPolylineStringFromPoints points)
         ]
         []
+
+
+svgCanvas : Model -> Element Msg
+svgCanvas model =
+    let
+        width =
+            String.fromFloat <| model.viewportWidth - 40
+
+        height =
+            String.fromFloat <| model.viewportHeight - 40
+
+        halfWidth =
+            String.fromFloat ((model.viewportWidth - 40) / 2)
+
+        halfHeight =
+            String.fromFloat ((model.viewportHeight - 40) / 2)
+    in
+    html <|
+        S.svg
+            [ Sa.width width
+            , Sa.height height
+            , Sa.viewBox <|
+                ""
+                    ++ "-"
+                    ++ halfWidth
+                    ++ " "
+                    ++ "-"
+                    ++ halfHeight
+                    ++ halfWidth
+                    ++ " "
+                    ++ halfHeight
+            ]
+            (List.concat
+                [ --List.map svgPoint (List.concat model.strokes)
+                  [ cubicSpline model.lastStroke ]
+                , List.map cubicSpline model.strokes
+
+                {--
+                , [ smoothStroke model.lastStroke ]
+                , List.map smoothStroke model.strokes
+                --}
+                ]
+            )
