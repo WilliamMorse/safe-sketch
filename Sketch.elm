@@ -16,6 +16,7 @@ import Svg as S
 import Svg.Attributes as Sa
 import Svg.Lazy as L
 import Task
+import Time
 
 
 main : Program () Model Msg
