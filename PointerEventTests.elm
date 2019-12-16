@@ -3,10 +3,12 @@ module Main exposing (Model, Msg(..), Point, init, main, subscriptions, update, 
 import Browser
 import Browser.Dom exposing (Viewport)
 import Browser.Events as Be
+import Element exposing (..)
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode as D
+import Pointer exposing (Event, onDown, onMove, onUp)
 import Task
 
 
@@ -25,16 +27,17 @@ type alias Point =
 
 
 type alias Model =
-    String
+    Maybe Event
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( "  ", Cmd.none )
+    ( Nothing, Cmd.none )
 
 
 type Msg
     = NoOp
+    | Pointer Event
 
 
 subscriptions : Model -> Sub Msg
@@ -48,7 +51,32 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
+        Pointer ev ->
+            ( Just ev, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
-    Html.div [] [ Html.text "hi" ]
+    Element.layout
+        [ width fill
+        , height fill
+        , htmlAttribute <| Html.Attributes.style "touch-action" "none"
+        , htmlAttribute <| Html.Attributes.style "user-select" "none"
+        , htmlAttribute <| onDown Pointer
+        , htmlAttribute <| onMove Pointer
+        , htmlAttribute <| blockContextMenu NoOp
+
+        --, htmlAttribute <| onUp Pointer
+        ]
+        (paragraph
+            []
+            [ text (Debug.toString model)
+            ]
+        )
+
+
+blockContextMenu : Msg -> Html.Attribute Msg
+blockContextMenu msg =
+    Html.Events.preventDefaultOn
+        "contextmenu"
+        (D.map (\m -> ( m, True )) (D.succeed msg))
