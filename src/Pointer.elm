@@ -1,9 +1,14 @@
-module Pointer exposing (Event, on, onDown, onMove, onUp)
+module Pointer exposing (Event, onDown, onMove, onUp)
 
 import Html
 import Html.Events
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode as Decode exposing (Decoder, field)
+
+
+type Pointer
+    = Mouse
+    | Touch
+    | Pen
 
 
 type alias Event =
@@ -20,14 +25,8 @@ type alias Event =
     }
 
 
-type Pointer
-    = Mouse
-    | Touch
-    | Pen
-
-
-inputTypeDecoderFromString : String -> Pointer
-inputTypeDecoderFromString str =
+inputTypeFromString : String -> Pointer
+inputTypeFromString str =
     case str of
         "touch" ->
             Touch
@@ -39,19 +38,30 @@ inputTypeDecoderFromString str =
             Mouse
 
 
+{--}
+andMap =
+    Decode.map2 (|>)
+
+
 eventDecoder : Decoder Event
 eventDecoder =
     Decode.succeed Event
-        |> required "pointerId" Decode.float
-        |> required "width" Decode.float
-        |> required "height" Decode.float
-        |> required "pressure" Decode.float
-        |> required "tangentialPressure" Decode.float
-        |> required "tiltX" Decode.float
-        |> required "tiltY" Decode.float
-        |> required "twist" Decode.float
-        |> required "pointerType" (Decode.map inputTypeDecoderFromString Decode.string)
-        |> required "isPrimary" Decode.bool
+        |> andMap (field "pointerId" Decode.float)
+        |> andMap (field "width" Decode.float)
+        |> andMap (field "height" Decode.float)
+        |> andMap (field "pressure" Decode.float)
+        |> andMap (field "tangentialPressure" Decode.float)
+        |> andMap (field "tiltX" Decode.float)
+        |> andMap (field "tiltY" Decode.float)
+        |> andMap (field "twist" Decode.float)
+        |> andMap
+            (field "pointerType"
+                (Decode.map inputTypeFromString
+                    Decode.string
+                )
+            )
+        |> andMap (field "isPrimary" Decode.bool)
+--}
 
 
 on : String -> (Event -> msg) -> Html.Attribute msg
@@ -74,19 +84,3 @@ onMove =
 onUp : (Event -> msg) -> Html.Attribute msg
 onUp =
     on "pointerup"
-
-
-
-{--
-type alias Event =
-    { primary : PointerInfo
-    , coalesced : List PointerInfo
-    }
---}
-{--
-coalesedEventDecoder : Decoder Event
-coalesedEventDecoder =
-    Decode.map2 Event
-        pointerInfoDecoder
-        (Decode.field "coalescedEvents" (Decode.list pointerInfoDecoder))
---}
