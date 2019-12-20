@@ -68,7 +68,10 @@ view model =
 
         --, htmlAttribute <| onUp Pointer
         ]
-        (column []
+        (column
+            [ padding 20
+            , spacing 20
+            ]
             [ text "Pointer Events v2 Test"
             , paragraph
                 []
