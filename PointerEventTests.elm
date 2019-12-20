@@ -41,7 +41,7 @@ type Msg
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -68,9 +68,12 @@ view model =
 
         --, htmlAttribute <| onUp Pointer
         ]
-        (paragraph
-            []
-            [ text (Debug.toString model)
+        (column []
+            [ text "Pointer Events v2 Test"
+            , paragraph
+                []
+                [ text (Debug.toString model)
+                ]
             ]
         )
 

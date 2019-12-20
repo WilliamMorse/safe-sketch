@@ -1,11 +1,11 @@
-module Pointer exposing (Event, onDown, onMove, onUp)
+module Pointer exposing (DeviceType(..), Event, onDown, onMove, onUp)
 
 import Html
 import Html.Events
 import Json.Decode as Decode exposing (Decoder, field)
 
 
-type Pointer
+type DeviceType
     = Mouse
     | Touch
     | Pen
@@ -20,12 +20,14 @@ type alias Event =
     , tiltX : Float
     , tiltY : Float
     , twist : Float
-    , pointerType : Pointer
+    , pointerType : DeviceType
     , isPrimary : Bool
+    , offsetX : Float
+    , offsetY : Float
     }
 
 
-inputTypeFromString : String -> Pointer
+inputTypeFromString : String -> DeviceType
 inputTypeFromString str =
     case str of
         "touch" ->
@@ -39,6 +41,7 @@ inputTypeFromString str =
 
 
 {--}
+andMap : Decoder a -> Decoder (a -> value) -> Decoder value
 andMap =
     Decode.map2 (|>)
 
@@ -61,6 +64,8 @@ eventDecoder =
                 )
             )
         |> andMap (field "isPrimary" Decode.bool)
+        |> andMap (field "offsetX" Decode.float)
+        |> andMap (field "offsetY" Decode.float)
 --}
 
 

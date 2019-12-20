@@ -10,8 +10,8 @@ import Element.Font as Font
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
-import Html.Events.Extra.Pointer as Pointer
 import Json.Decode as D
+import Pointer exposing (DeviceType, Event, onDown, onMove, onUp)
 import Svg as S
 import Svg.Attributes as Sa
 import Svg.Lazy as L
@@ -34,7 +34,7 @@ type alias Point =
 
 
 type alias Model =
-    { inputType : Pointer.DeviceType
+    { inputType : DeviceType
     , tiltX : Float
     , tiltY : Float
     , pressure : Float
@@ -51,7 +51,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { inputType = Pointer.MouseType
+    ( { inputType = Pointer.Pen
       , tiltX = 0.0
       , tiltY = 0.0
       , pressure = 0
@@ -104,15 +104,15 @@ update msg model =
             )
 
         Move event ->
-            if event.pointerType == Pointer.PenType then
+            if event.pointerType == Pointer.Pen then
                 ( { model
                     | inputType = event.pointerType
-                    , tiltX = event.contactDetails.tiltX
-                    , tiltY = event.contactDetails.tiltY
-                    , pressure = event.contactDetails.pressure
+                    , tiltX = event.tiltX
+                    , tiltY = event.tiltY
+                    , pressure = event.pressure
                     , latestEvent = Just event
-                    , offsetPos = event.pointer.offsetPos
-                    , lastStroke = List.append model.lastStroke [ event.pointer.offsetPos ]
+                    , offsetPos = ( event.offsetX, event.offsetY )
+                    , lastStroke = List.append model.lastStroke [ ( event.offsetX, event.offsetY ) ]
                   }
                 , Cmd.none
                 )
@@ -456,9 +456,8 @@ svgPolylineStringFromPoints points =
     points
         |> List.map
             (\p ->
-                (++)
-                    (String.fromFloat (Tuple.first p) ++ ",")
-                    (String.fromFloat (Tuple.second p) ++ " ")
+                (String.fromFloat (Tuple.first p) ++ ",")
+                    ++ (String.fromFloat (Tuple.second p) ++ " ")
             )
         |> String.concat
 
