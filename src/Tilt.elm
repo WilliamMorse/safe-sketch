@@ -24,7 +24,11 @@ type alias Spherical =
 
 radToDec : Float -> Float
 radToDec rad =
-    rad * (180 / pi)
+    rad * 1
+
+
+
+--(180 / pi)
 
 
 toCartesian : Tilt -> Cartesian
