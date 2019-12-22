@@ -95,9 +95,22 @@ update msg model =
             ( model, Cmd.none )
 
         Down event ->
-            ( { model | pointerDown = True }
-            , Cmd.none
-            )
+            if event.pointerType == Pointer.Pen then
+                ( { model
+                    | pointerDown = True
+                    , inputType = event.pointerType
+                    , tiltX = event.tiltX
+                    , tiltY = event.tiltY
+                    , pressure = event.pressure
+                    , latestEvent = Just event
+                    , offsetPos = ( event.offsetX, event.offsetY )
+                    , lastStroke = List.append model.lastStroke [ ( event.offsetX, event.offsetY ) ]
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
 
         Move event ->
             if event.pointerType == Pointer.Pen then
@@ -117,13 +130,26 @@ update msg model =
                 ( model, Cmd.none )
 
         Up event ->
-            ( { model
-                | strokes = model.lastStroke :: model.strokes
-                , lastStroke = []
-                , pointerDown = False
-              }
-            , Cmd.none
-            )
+            if event.pointerType == Pointer.Pen then
+                ( { model
+                    | strokes =
+                        List.append model.lastStroke
+                            [ ( event.offsetX, event.offsetY ) ]
+                            :: model.strokes
+                    , lastStroke = []
+                    , pointerDown = False
+                    , inputType = event.pointerType
+                    , tiltX = event.tiltX
+                    , tiltY = event.tiltY
+                    , pressure = event.pressure
+                    , latestEvent = Just event
+                    , offsetPos = ( event.offsetX, event.offsetY )
+                  }
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
 
         UpdateViewport vp ->
             let
@@ -500,9 +526,9 @@ svgCanvas model =
                     ++ halfHeight
             ]
             (List.concat
-                [ --List.map svgPoint (List.concat model.strokes)
-                  [ cubicSpline model.lastStroke ]
+                [ [ cubicSpline model.lastStroke ]
                 , List.map cubicSpline model.strokes
+                , List.map svgPoint (List.concat model.strokes)
 
                 {--
                 , [ smoothStroke model.lastStroke ]
