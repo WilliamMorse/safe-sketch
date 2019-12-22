@@ -39,6 +39,10 @@ defaultEvent =
     , isPrimary = False
     , offsetX = 0
     , offsetY = 0
+    , screenX = 0
+    , screenY = 0
+    , pageX = 0
+    , pageY = 0
     }
 
 
@@ -193,8 +197,17 @@ blockContextMenu msg =
         (D.map (\m -> ( m, True )) (D.succeed msg))
 
 
+position : Model -> List { label : String, x : Float, y : Float }
 position m =
-    [ { label = "Offset Position"
+    [ { label = "Screen Position"
+      , x = m.screenX
+      , y = m.screenY
+      }
+    , { label = "Page Position"
+      , x = m.pageX
+      , y = m.pageY
+      }
+    , { label = "Offset Position"
       , x = m.offsetX
       , y = m.offsetY
       }

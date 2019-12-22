@@ -24,6 +24,10 @@ type alias Event =
     , isPrimary : Bool
     , offsetX : Float
     , offsetY : Float
+    , screenX : Float
+    , screenY : Float
+    , pageX : Float
+    , pageY : Float
     }
 
 
@@ -66,6 +70,10 @@ eventDecoder =
         |> andMap (field "isPrimary" Decode.bool)
         |> andMap (field "offsetX" Decode.float)
         |> andMap (field "offsetY" Decode.float)
+        |> andMap (field "screenX" Decode.float)
+        |> andMap (field "screenY" Decode.float)
+        |> andMap (field "pageX" Decode.float)
+        |> andMap (field "pageY" Decode.float)
 --}
 
 

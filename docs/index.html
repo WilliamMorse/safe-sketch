@@ -5203,7 +5203,7 @@ var $author$project$Pointer$Mouse = {$: 'Mouse'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$Main$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, tangentialpressure: 0, tiltX: 0, tiltY: 0, twist: 0, width: 0};
+var $author$project$Main$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialpressure: 0, tiltX: 0, tiltY: 0, twist: 0, width: 0};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = _Utils_Tuple2($author$project$Main$defaultEvent, $elm$core$Platform$Cmd$none);
@@ -11120,7 +11120,15 @@ var $author$project$Pointer$Event = function (pointerId) {
 									return function (isPrimary) {
 										return function (offsetX) {
 											return function (offsetY) {
-												return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, twist: twist, width: width};
+												return function (screenX) {
+													return function (screenY) {
+														return function (pageX) {
+															return function (pageY) {
+																return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, twist: twist, width: width};
+															};
+														};
+													};
+												};
 											};
 										};
 									};
@@ -11152,44 +11160,56 @@ var $author$project$Pointer$inputTypeFromString = function (str) {
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Pointer$eventDecoder = A2(
 	$author$project$Pointer$andMap,
-	A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float),
 	A2(
 		$author$project$Pointer$andMap,
-		A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
+		A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
 		A2(
 			$author$project$Pointer$andMap,
-			A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
+			A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float),
 			A2(
 				$author$project$Pointer$andMap,
-				A2(
-					$elm$json$Json$Decode$field,
-					'pointerType',
-					A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string)),
+				A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
 				A2(
 					$author$project$Pointer$andMap,
-					A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float),
+					A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float),
 					A2(
 						$author$project$Pointer$andMap,
-						A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float),
+						A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
 						A2(
 							$author$project$Pointer$andMap,
-							A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
+							A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
 							A2(
 								$author$project$Pointer$andMap,
-								A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float),
+								A2(
+									$elm$json$Json$Decode$field,
+									'pointerType',
+									A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string)),
 								A2(
 									$author$project$Pointer$andMap,
-									A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
+									A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float),
 									A2(
 										$author$project$Pointer$andMap,
-										A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
+										A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float),
 										A2(
 											$author$project$Pointer$andMap,
-											A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+											A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
 											A2(
 												$author$project$Pointer$andMap,
-												A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float),
-												$elm$json$Json$Decode$succeed($author$project$Pointer$Event)))))))))))));
+												A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float),
+												A2(
+													$author$project$Pointer$andMap,
+													A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
+													A2(
+														$author$project$Pointer$andMap,
+														A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
+														A2(
+															$author$project$Pointer$andMap,
+															A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+															A2(
+																$author$project$Pointer$andMap,
+																A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float),
+																$elm$json$Json$Decode$succeed($author$project$Pointer$Event)))))))))))))))));
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -11323,6 +11343,8 @@ var $mdgriffith$elm_ui$Element$paragraph = F2(
 var $author$project$Main$position = function (m) {
 	return _List_fromArray(
 		[
+			{label: 'Screen Position', x: m.screenX, y: m.screenY},
+			{label: 'Page Position', x: m.pageX, y: m.pageY},
 			{label: 'Offset Position', x: m.offsetX, y: m.offsetY}
 		]);
 };

@@ -4,19 +4,15 @@ import Browser
 import Browser.Dom exposing (Viewport)
 import Browser.Events as Be
 import Element exposing (..)
-import Element.Background as Background
 import Element.Border as Border
-import Element.Font as Font
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode as D
-import Pointer exposing (DeviceType, Event, onDown, onMove, onUp)
+import Pointer exposing (DeviceType, onDown, onMove, onUp)
 import Svg as S
 import Svg.Attributes as Sa
-import Svg.Lazy as L
 import Task
-import Time
 
 
 main : Program () Model Msg
