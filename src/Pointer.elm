@@ -1,4 +1,4 @@
-module Pointer exposing (DeviceType(..), Event, onDown, onMove, onUp)
+module Pointer exposing (DeviceType(..), Event, eventDecoder, onDown, onMove, onUp)
 
 import Html
 import Html.Events

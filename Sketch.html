@@ -1,17 +1,42 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Main</title>
-  <script src="main.js"></script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <script src="elm.js"></script>
+  </head>
 
-<body>
-  <div id="elm"></div>
-  <script>
+  <body>
+    <div id="lowtest">
+      <div id="elm"></div>
+    </div>
+    <script>
   var app = Elm.Main.init({
     node: document.getElementById('elm')
   });
+
+  function eventHandeler(e) {
+    // Feature detection for getCoalescedEvents as it was introduced in PointerEvents V3
+    if (e.getCoalescedEvents) {
+      console.log("coal", e.getCoalescedEvents().length)
+      //for (let coalesced_event of e.getCoalescedEvents())
+        //{
+       //   app.ports.moveEvent.send(coalesced_event);
+       // }
+      app.ports.moveEvent.send(e.getCoalescedEvents())
+    }
+    else {
+      app.ports.moveEvent.send([e]);
+      }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+      var canvas = document.getElementById("lowtest")
+      canvas.addEventListener("pointermove", eventHandeler);
+  });
+  
+
+  
   </script>
-</body>
+  </body>
 </html>
