@@ -5229,6 +5229,11 @@ var $author$project$Main$NoOp = {$: 'NoOp'};
 var $author$project$Main$Pointer = function (a) {
 	return {$: 'Pointer', a: a};
 };
+var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
+	return {$: 'AlignX', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
+var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 'MayPreventDefault', a: a};
 };
@@ -11229,22 +11234,22 @@ var $author$project$Pointer$on = F2(
 	});
 var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
 var $author$project$Pointer$onMove = $author$project$Pointer$on('pointermove');
-var $author$project$Tilt$Tilt = F3(
+var $author$project$PenTilt$Tilt = F3(
 	function (r, x, y) {
 		return {r: r, x: x, y: y};
 	});
-var $author$project$Tilt$Spherical = F3(
+var $author$project$PenTilt$Spherical = F3(
 	function (r, theta, phi) {
 		return {phi: phi, r: r, theta: theta};
 	});
 var $elm$core$Basics$atan2 = _Basics_atan2;
 var $elm$core$Basics$pow = _Basics_pow;
-var $author$project$Tilt$radToDec = function (rad) {
+var $author$project$PenTilt$radToDec = function (rad) {
 	return rad * 1;
 };
 var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Tilt$cartiesian_to_spherical = function (cart) {
-	var theta = $author$project$Tilt$radToDec(
+var $author$project$PenTilt$cartiesian_to_spherical = function (cart) {
+	var theta = $author$project$PenTilt$radToDec(
 		A2(
 			$elm$core$Basics$atan2,
 			$elm$core$Basics$sqrt(
@@ -11252,34 +11257,51 @@ var $author$project$Tilt$cartiesian_to_spherical = function (cart) {
 			cart.z));
 	var r = $elm$core$Basics$sqrt(
 		(A2($elm$core$Basics$pow, cart.x, 2) + A2($elm$core$Basics$pow, cart.y, 2)) + A2($elm$core$Basics$pow, cart.z, 2));
-	var phi = $author$project$Tilt$radToDec(
+	var phi = $author$project$PenTilt$radToDec(
 		A2($elm$core$Basics$atan2, cart.y, cart.x));
-	return A3($author$project$Tilt$Spherical, r, theta, phi);
+	return A3($author$project$PenTilt$Spherical, r, theta, phi);
 };
-var $author$project$Tilt$Cartesian = F3(
+var $author$project$PenTilt$Cartesian = F3(
 	function (x, y, z) {
 		return {x: x, y: y, z: z};
 	});
 var $elm$core$Basics$cos = _Basics_cos;
 var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Tilt$toCartesian = function (tilt) {
+var $author$project$PenTilt$toCartesian = function (tilt) {
 	var z = $elm$core$Basics$cos(tilt.x) * $elm$core$Basics$cos(tilt.y);
 	var y = $elm$core$Basics$cos(tilt.x) * $elm$core$Basics$sin(tilt.y);
 	var x = $elm$core$Basics$sin(tilt.x) * $elm$core$Basics$cos(tilt.y);
 	var norm = $elm$core$Basics$sqrt(
 		(A2($elm$core$Basics$pow, x, 2) + A2($elm$core$Basics$pow, y, 2)) + A2($elm$core$Basics$pow, z, 2));
-	return A3($author$project$Tilt$Cartesian, x / norm, y / norm, z / norm);
+	return A3($author$project$PenTilt$Cartesian, x / norm, y / norm, z / norm);
 };
-var $author$project$Tilt$toSpherical = function (tilt) {
-	return $author$project$Tilt$cartiesian_to_spherical(
-		$author$project$Tilt$toCartesian(tilt));
+var $author$project$PenTilt$toSpherical = function (tilt) {
+	return $author$project$PenTilt$cartiesian_to_spherical(
+		$author$project$PenTilt$toCartesian(tilt));
 };
+var $elm$core$Basics$truncate = _Basics_truncate;
+var $author$project$Main$truncateTo = F2(
+	function (places, number) {
+		var t = $elm$core$String$length(
+			$elm$core$String$fromInt(number | 0));
+		return A2(
+			$elm$core$String$left,
+			places + t,
+			$elm$core$String$fromFloat(number));
+	});
 var $author$project$Main$orentation = function (m) {
-	var sph = $author$project$Tilt$toSpherical(
-		A3($author$project$Tilt$Tilt, 1, m.tiltX, m.tiltY));
+	var sph = $author$project$PenTilt$toSpherical(
+		A3($author$project$PenTilt$Tilt, 1, m.tiltX, m.tiltY));
 	return _List_fromArray(
 		[
-			{label: 'Pen Orentation', phi: sph.phi, theta: sph.theta, tiltX: m.tiltX, tiltY: m.tiltY, twist: m.twist}
+			{
+			label: 'Pen Orentation',
+			phi: A2($author$project$Main$truncateTo, 5, sph.phi),
+			theta: A2($author$project$Main$truncateTo, 5, sph.theta),
+			tiltX: m.tiltX,
+			tiltY: m.tiltY,
+			twist: m.twist
+		}
 		]);
 };
 var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
@@ -11299,10 +11321,36 @@ var $mdgriffith$elm_ui$Element$padding = function (x) {
 			x,
 			x));
 };
-var $mdgriffith$elm_ui$Internal$Model$Describe = function (a) {
-	return {$: 'Describe', a: a};
+var $author$project$Main$position = function (m) {
+	return _List_fromArray(
+		[
+			{
+			label: 'Screen Position',
+			x: A2($author$project$Main$truncateTo, 5, m.screenX),
+			y: A2($author$project$Main$truncateTo, 5, m.screenY)
+		},
+			{
+			label: 'Page Position',
+			x: A2($author$project$Main$truncateTo, 5, m.pageX),
+			y: A2($author$project$Main$truncateTo, 5, m.pageY)
+		},
+			{
+			label: 'Offset Position',
+			x: A2($author$project$Main$truncateTo, 5, m.offsetX),
+			y: A2($author$project$Main$truncateTo, 5, m.offsetY)
+		}
+		]);
 };
-var $mdgriffith$elm_ui$Internal$Model$Paragraph = {$: 'Paragraph'};
+var $author$project$Main$pressure = function (m) {
+	return _List_fromArray(
+		[
+			{
+			label: 'Normalized Force',
+			press: A2($author$project$Main$truncateTo, 5, m.pressure),
+			tanpress: A2($author$project$Main$truncateTo, 5, m.tangentialpressure)
+		}
+		]);
+};
 var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
 	function (a, b, c) {
 		return {$: 'SpacingStyle', a: a, b: b, c: c};
@@ -11321,38 +11369,6 @@ var $mdgriffith$elm_ui$Element$spacing = function (x) {
 			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
 			x,
 			x));
-};
-var $mdgriffith$elm_ui$Element$paragraph = F2(
-	function (attrs, children) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asParagraph,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Internal$Model$Describe($mdgriffith$elm_ui$Internal$Model$Paragraph),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-					A2(
-						$elm$core$List$cons,
-						$mdgriffith$elm_ui$Element$spacing(5),
-						attrs))),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
-	});
-var $author$project$Main$position = function (m) {
-	return _List_fromArray(
-		[
-			{label: 'Screen Position', x: m.screenX, y: m.screenY},
-			{label: 'Page Position', x: m.pageX, y: m.pageY},
-			{label: 'Offset Position', x: m.offsetX, y: m.offsetY}
-		]);
-};
-var $author$project$Main$pressure = function (m) {
-	return _List_fromArray(
-		[
-			{label: 'Normalized Force', press: m.pressure, tanpress: m.tangentialpressure}
-		]);
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -11590,18 +11606,51 @@ var $mdgriffith$elm_ui$Element$table = F2(
 				data: config.data
 			});
 	});
+var $mdgriffith$elm_ui$Internal$Model$VariantActive = function (a) {
+	return {$: 'VariantActive', a: a};
+};
+var $mdgriffith$elm_ui$Element$Font$tabularNumbers = $mdgriffith$elm_ui$Internal$Model$VariantActive('tnum');
 var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 	return {$: 'Text', a: a};
 };
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$touch = function (m) {
 	return _List_fromArray(
 		[
-			{height: m.height, label: 'Touch', width: m.width}
+			{
+			height: A2($author$project$Main$truncateTo, 5, m.height),
+			label: 'Touch',
+			width: A2($author$project$Main$truncateTo, 5, m.width)
+		}
 		]);
+};
+var $mdgriffith$elm_ui$Internal$Model$Class = F2(
+	function (a, b) {
+		return {$: 'Class', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$fontVariant = $mdgriffith$elm_ui$Internal$Flag$flag(48);
+var $mdgriffith$elm_ui$Element$Font$variant = function (_var) {
+	switch (_var.$) {
+		case 'VariantActive':
+			var name = _var.a;
+			return A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + name);
+		case 'VariantOff':
+			var name = _var.a;
+			return A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$fontVariant, 'v-' + (name + '-off'));
+		default:
+			var name = _var.a;
+			var index = _var.b;
+			return A2(
+				$mdgriffith$elm_ui$Internal$Model$StyleClass,
+				$mdgriffith$elm_ui$Internal$Flag$fontVariant,
+				A3(
+					$mdgriffith$elm_ui$Internal$Model$Single,
+					'v-' + (name + ('-' + $elm$core$String$fromInt(index))),
+					'font-feature-settings',
+					'\"' + (name + ('\" ' + $elm$core$String$fromInt(index)))));
+	}
 };
 var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
 	function (a, b, c, d, e) {
@@ -11642,7 +11691,10 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$padding(20),
-					$mdgriffith$elm_ui$Element$spacing(20)
+					$mdgriffith$elm_ui$Element$spacing(20),
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$Font$variant($mdgriffith$elm_ui$Element$Font$tabularNumbers),
+					$mdgriffith$elm_ui$Element$alignRight
 				]),
 			_List_fromArray(
 				[
@@ -11651,7 +11703,7 @@ var $author$project$Main$view = function (model) {
 					$mdgriffith$elm_ui$Element$table,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$spacing(5),
+							$mdgriffith$elm_ui$Element$spacing(10),
 							$mdgriffith$elm_ui$Element$Border$width(2),
 							$mdgriffith$elm_ui$Element$padding(10)
 						]),
@@ -11670,16 +11722,14 @@ var $author$project$Main$view = function (model) {
 								$mdgriffith$elm_ui$Element$text('x'),
 								$mdgriffith$elm_ui$Element$fill,
 								function (p) {
-									return $mdgriffith$elm_ui$Element$text(
-										$elm$core$String$fromFloat(p.x));
+									return $mdgriffith$elm_ui$Element$text(p.x);
 								}),
 								A3(
 								$mdgriffith$elm_ui$Element$Column,
 								$mdgriffith$elm_ui$Element$text('y'),
 								$mdgriffith$elm_ui$Element$fill,
 								function (p) {
-									return $mdgriffith$elm_ui$Element$text(
-										$elm$core$String$fromFloat(p.y));
+									return $mdgriffith$elm_ui$Element$text(p.y);
 								})
 							]),
 						data: $author$project$Main$position(model)
@@ -11688,7 +11738,7 @@ var $author$project$Main$view = function (model) {
 					$mdgriffith$elm_ui$Element$table,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$spacing(5),
+							$mdgriffith$elm_ui$Element$spacing(10),
 							$mdgriffith$elm_ui$Element$Border$width(2),
 							$mdgriffith$elm_ui$Element$padding(10)
 						]),
@@ -11733,7 +11783,7 @@ var $author$project$Main$view = function (model) {
 					$mdgriffith$elm_ui$Element$table,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$spacing(5),
+							$mdgriffith$elm_ui$Element$spacing(10),
 							$mdgriffith$elm_ui$Element$Border$width(2),
 							$mdgriffith$elm_ui$Element$padding(10)
 						]),
@@ -11752,16 +11802,14 @@ var $author$project$Main$view = function (model) {
 								$mdgriffith$elm_ui$Element$text('Pressure'),
 								$mdgriffith$elm_ui$Element$fill,
 								function (p) {
-									return $mdgriffith$elm_ui$Element$text(
-										$elm$core$String$fromFloat(p.press));
+									return $mdgriffith$elm_ui$Element$text(p.press);
 								}),
 								A3(
 								$mdgriffith$elm_ui$Element$Column,
 								$mdgriffith$elm_ui$Element$text('Tangential Pressure'),
 								$mdgriffith$elm_ui$Element$fill,
 								function (p) {
-									return $mdgriffith$elm_ui$Element$text(
-										$elm$core$String$fromFloat(p.tanpress));
+									return $mdgriffith$elm_ui$Element$text(p.tanpress);
 								})
 							]),
 						data: $author$project$Main$pressure(model)
@@ -11770,7 +11818,7 @@ var $author$project$Main$view = function (model) {
 					$mdgriffith$elm_ui$Element$table,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$spacing(5),
+							$mdgriffith$elm_ui$Element$spacing(10),
 							$mdgriffith$elm_ui$Element$Border$width(2),
 							$mdgriffith$elm_ui$Element$padding(10)
 						]),
@@ -11789,28 +11837,18 @@ var $author$project$Main$view = function (model) {
 								$mdgriffith$elm_ui$Element$text('Height'),
 								$mdgriffith$elm_ui$Element$fill,
 								function (p) {
-									return $mdgriffith$elm_ui$Element$text(
-										$elm$core$String$fromFloat(p.height));
+									return $mdgriffith$elm_ui$Element$text(p.height);
 								}),
 								A3(
 								$mdgriffith$elm_ui$Element$Column,
 								$mdgriffith$elm_ui$Element$text('Width'),
 								$mdgriffith$elm_ui$Element$fill,
 								function (p) {
-									return $mdgriffith$elm_ui$Element$text(
-										$elm$core$String$fromFloat(p.width));
+									return $mdgriffith$elm_ui$Element$text(p.width);
 								})
 							]),
 						data: $author$project$Main$touch(model)
-					}),
-					A2(
-					$mdgriffith$elm_ui$Element$paragraph,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$text(
-							$elm$core$Debug$toString(model))
-						]))
+					})
 				])));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

@@ -1,14 +1,15 @@
 module Main exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
 
 import Browser
-import Element exposing (..)
+import Element exposing (Column, column, fill, height, htmlAttribute, padding, spacing, table, text, width)
 import Element.Border as Border
+import Element.Font as Font
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode as D
-import Pointer exposing (DeviceType(..), Event, onDown, onMove, onUp)
-import Tilt as Tilt
+import PenTilt as Tilt
+import Pointer exposing (DeviceType(..), Event, onDown, onMove)
 
 
 main : Program () Model Msg
@@ -92,12 +93,14 @@ view model =
             [ padding 20
             , spacing 20
             , width fill
+            , Font.variant Font.tabularNumbers
+            , Element.alignRight
             ]
             [ text "Pointer Events v2 Test"
 
             -- POSITION
             , table
-                [ spacing 5
+                [ spacing 10
                 , Border.width 2
                 , padding 10
                 ]
@@ -109,16 +112,16 @@ view model =
                         (\p -> text <| p.label)
                     , Column (text "x")
                         fill
-                        (\p -> text <| String.fromFloat p.x)
+                        (\p -> text <| p.x)
                     , Column (text "y")
                         fill
-                        (\p -> text <| String.fromFloat p.y)
+                        (\p -> text <| p.y)
                     ]
                 }
 
             -- ORENTATION
             , table
-                [ spacing 5
+                [ spacing 10
                 , Border.width 2
                 , padding 10
                 ]
@@ -142,7 +145,7 @@ view model =
 
             -- PRESSURE
             , table
-                [ spacing 5
+                [ spacing 10
                 , Border.width 2
                 , padding 10
                 ]
@@ -155,15 +158,15 @@ view model =
                     , Column
                         (text "Pressure")
                         fill
-                        (\p -> text <| String.fromFloat p.press)
+                        (\p -> text <| p.press)
                     , Column
                         (text "Tangential Pressure")
                         fill
-                        (\p -> text <| String.fromFloat p.tanpress)
+                        (\p -> text <| p.tanpress)
                     ]
                 }
             , table
-                [ spacing 5
+                [ spacing 10
                 , Border.width 2
                 , padding 10
                 ]
@@ -176,11 +179,11 @@ view model =
                     , Column
                         (text "Height")
                         fill
-                        (\p -> text <| String.fromFloat p.height)
+                        (\p -> text <| p.height)
                     , Column
                         (text "Width")
                         fill
-                        (\p -> text <| String.fromFloat p.width)
+                        (\p -> text <| p.width)
                     ]
                 }
             ]
@@ -194,19 +197,19 @@ blockContextMenu msg =
         (D.map (\m -> ( m, True )) (D.succeed msg))
 
 
-position : Model -> List { label : String, x : Float, y : Float }
+position : Model -> List { label : String, x : String, y : String }
 position m =
     [ { label = "Screen Position"
-      , x = m.screenX
-      , y = m.screenY
+      , x = truncateTo 5 m.screenX
+      , y = truncateTo 5 m.screenY
       }
     , { label = "Page Position"
-      , x = m.pageX
-      , y = m.pageY
+      , x = truncateTo 5 m.pageX
+      , y = truncateTo 5 m.pageY
       }
     , { label = "Offset Position"
-      , x = m.offsetX
-      , y = m.offsetY
+      , x = truncateTo 5 m.offsetX
+      , y = truncateTo 5 m.offsetY
       }
     ]
 
@@ -219,8 +222,8 @@ orentation m =
     [ { label = "Pen Orentation"
       , tiltX = m.tiltX
       , tiltY = m.tiltY
-      , theta = sph.theta
-      , phi = sph.phi
+      , theta = truncateTo 5 sph.theta
+      , phi = truncateTo 5 sph.phi
       , twist = m.twist
       }
     ]
@@ -228,15 +231,38 @@ orentation m =
 
 pressure m =
     [ { label = "Normalized Force"
-      , press = m.pressure
-      , tanpress = m.tangentialpressure
+      , press = truncateTo 5 m.pressure
+      , tanpress = truncateTo 5 m.tangentialpressure
       }
     ]
 
 
 touch m =
     [ { label = "Touch"
-      , height = m.height
-      , width = m.width
+      , height = truncateTo 5 m.height
+      , width = truncateTo 5 m.width
       }
     ]
+
+
+shiftDecimalBy : Int -> Float -> Float
+shiftDecimalBy places number =
+    number * toFloat (10 ^ places)
+
+
+truncateTo : Int -> Float -> String
+truncateTo places number =
+    let
+        t =
+            number
+                |> truncate
+                |> String.fromInt
+                |> String.length
+    in
+    number
+        |> String.fromFloat
+        |> String.left (places + t)
+
+
+
+--toFloat (truncate (number * toFloat placesAfterDecimal)) / toFloat placesAfterDecimal
