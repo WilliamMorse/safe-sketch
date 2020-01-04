@@ -1,17 +1,47 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Main</title>
-  <script src="main.js"></script>
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <title>safe sketch</title>
+    <script src="elm.js"></script>
+  </head>
 
-<body>
-  <div id="elm"></div>
-  <script>
-  var app = Elm.Main.init({
-    node: document.getElementById('elm')
-  });
+  <body>
+    <div id="elm"></div>
+    <script>
+      var app = Elm.Main.init({
+        node: document.getElementById("elm")
+      });
+
+      function moveEventHandeler(event) {
+        if (event.pointerType == "pen") { // Feature detection for getCoalescedEvents in PointerEvents V3
+
+          if (event.getCoalescedEvents ) {
+            //console.log("coal", event.getCoalescedEvents().length)
+            app.ports.penMoveEvents.send(event.getCoalescedEvents())
+
+            if (event.getPredictedEvents) {
+              //console.log("pre", event.getPredictedEvents().length)
+              app.ports.penPredictedEvents.send(event.getPredictedEvents())
+            }
+            
+          }
+          else {
+            // fallback for non coalesced event support
+            app.ports.penMoveEvents.send([event]);
+            }
+          
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+          console.log("DOMLoaded")
+          var canvas = document.getElementById("sketchspace")
+          canvas.addEventListener("pointermove",  moveEventHandeler );
+      });
+  
+
+  
   </script>
-</body>
+  </body>
 </html>

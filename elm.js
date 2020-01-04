@@ -5191,174 +5191,21 @@ var $author$project$Main$UpdateViewport = function (a) {
 };
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $author$project$Main$init = _Utils_Tuple2(
-	{
-		controlPoints: _List_fromArray(
-			[_List_Nil]),
-		inputType: $author$project$Pointer$Pen,
-		lastStroke: _List_Nil,
-		latestEvent: $elm$core$Maybe$Nothing,
-		offsetPos: _Utils_Tuple2(0, 0),
-		pointerDown: false,
-		pressure: 0,
-		strokes: _List_fromArray(
-			[
-				_List_fromArray(
-				[
-					_Utils_Tuple2(100, 100),
-					_Utils_Tuple2(500, 500),
-					_Utils_Tuple2(100, 600),
-					_Utils_Tuple2(200, 600)
-				])
-			]),
-		tiltX: 0.0,
-		tiltY: 0.0,
-		viewportHeight: 10,
-		viewportWidth: 10
-	},
+	{currentStroke: _List_Nil, currentStrokeCoalesced: _List_Nil, inputType: $author$project$Pointer$Pen, pointerDown: false, predictedStroke: _List_Nil, strokes: _List_Nil, viewportHeight: 30, viewportWidth: 30},
 	A2($elm$core$Task$perform, $author$project$Main$UpdateViewport, $elm$browser$Browser$Dom$getViewport));
-var $author$project$Main$AnimationUpdate = function (a) {
-	return {$: 'AnimationUpdate', a: a};
+var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
+var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
+var $author$project$Main$Move = function (a) {
+	return {$: 'Move', a: a};
+};
+var $author$project$Main$Prediction = function (a) {
+	return {$: 'Prediction', a: a};
 };
 var $author$project$Main$WindowResize = F2(
 	function (a, b) {
 		return {$: 'WindowResize', a: a, b: b};
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$browser$Browser$AnimationManager$Delta = function (a) {
-	return {$: 'Delta', a: a};
-};
-var $elm$browser$Browser$AnimationManager$State = F3(
-	function (subs, request, oldTime) {
-		return {oldTime: oldTime, request: request, subs: subs};
-	});
-var $elm$browser$Browser$AnimationManager$init = $elm$core$Task$succeed(
-	A3($elm$browser$Browser$AnimationManager$State, _List_Nil, $elm$core$Maybe$Nothing, 0));
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$browser$Browser$AnimationManager$now = _Browser_now(_Utils_Tuple0);
-var $elm$browser$Browser$AnimationManager$rAF = _Browser_rAF(_Utils_Tuple0);
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$browser$Browser$AnimationManager$onEffects = F3(
-	function (router, subs, _v0) {
-		var request = _v0.request;
-		var oldTime = _v0.oldTime;
-		var _v1 = _Utils_Tuple2(request, subs);
-		if (_v1.a.$ === 'Nothing') {
-			if (!_v1.b.b) {
-				var _v2 = _v1.a;
-				return $elm$browser$Browser$AnimationManager$init;
-			} else {
-				var _v4 = _v1.a;
-				return A2(
-					$elm$core$Task$andThen,
-					function (pid) {
-						return A2(
-							$elm$core$Task$andThen,
-							function (time) {
-								return $elm$core$Task$succeed(
-									A3(
-										$elm$browser$Browser$AnimationManager$State,
-										subs,
-										$elm$core$Maybe$Just(pid),
-										time));
-							},
-							$elm$browser$Browser$AnimationManager$now);
-					},
-					$elm$core$Process$spawn(
-						A2(
-							$elm$core$Task$andThen,
-							$elm$core$Platform$sendToSelf(router),
-							$elm$browser$Browser$AnimationManager$rAF)));
-			}
-		} else {
-			if (!_v1.b.b) {
-				var pid = _v1.a.a;
-				return A2(
-					$elm$core$Task$andThen,
-					function (_v3) {
-						return $elm$browser$Browser$AnimationManager$init;
-					},
-					$elm$core$Process$kill(pid));
-			} else {
-				return $elm$core$Task$succeed(
-					A3($elm$browser$Browser$AnimationManager$State, subs, request, oldTime));
-			}
-		}
-	});
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$browser$Browser$AnimationManager$onSelfMsg = F3(
-	function (router, newTime, _v0) {
-		var subs = _v0.subs;
-		var oldTime = _v0.oldTime;
-		var send = function (sub) {
-			if (sub.$ === 'Time') {
-				var tagger = sub.a;
-				return A2(
-					$elm$core$Platform$sendToApp,
-					router,
-					tagger(
-						$elm$time$Time$millisToPosix(newTime)));
-			} else {
-				var tagger = sub.a;
-				return A2(
-					$elm$core$Platform$sendToApp,
-					router,
-					tagger(newTime - oldTime));
-			}
-		};
-		return A2(
-			$elm$core$Task$andThen,
-			function (pid) {
-				return A2(
-					$elm$core$Task$andThen,
-					function (_v1) {
-						return $elm$core$Task$succeed(
-							A3(
-								$elm$browser$Browser$AnimationManager$State,
-								subs,
-								$elm$core$Maybe$Just(pid),
-								newTime));
-					},
-					$elm$core$Task$sequence(
-						A2($elm$core$List$map, send, subs)));
-			},
-			$elm$core$Process$spawn(
-				A2(
-					$elm$core$Task$andThen,
-					$elm$core$Platform$sendToSelf(router),
-					$elm$browser$Browser$AnimationManager$rAF)));
-	});
-var $elm$browser$Browser$AnimationManager$Time = function (a) {
-	return {$: 'Time', a: a};
-};
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $elm$browser$Browser$AnimationManager$subMap = F2(
-	function (func, sub) {
-		if (sub.$ === 'Time') {
-			var tagger = sub.a;
-			return $elm$browser$Browser$AnimationManager$Time(
-				A2($elm$core$Basics$composeL, func, tagger));
-		} else {
-			var tagger = sub.a;
-			return $elm$browser$Browser$AnimationManager$Delta(
-				A2($elm$core$Basics$composeL, func, tagger));
-		}
-	});
-_Platform_effectManagers['Browser.AnimationManager'] = _Platform_createManager($elm$browser$Browser$AnimationManager$init, $elm$browser$Browser$AnimationManager$onEffects, $elm$browser$Browser$AnimationManager$onSelfMsg, 0, $elm$browser$Browser$AnimationManager$subMap);
-var $elm$browser$Browser$AnimationManager$subscription = _Platform_leaf('Browser.AnimationManager');
-var $elm$browser$Browser$AnimationManager$onAnimationFrameDelta = function (tagger) {
-	return $elm$browser$Browser$AnimationManager$subscription(
-		$elm$browser$Browser$AnimationManager$Delta(tagger));
-};
-var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$AnimationManager$onAnimationFrameDelta;
 var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5511,6 +5358,7 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
+var $elm$core$Process$kill = _Scheduler_kill;
 var $elm$core$Dict$foldl = F3(
 	function (func, acc, dict) {
 		foldl:
@@ -5601,6 +5449,7 @@ var $elm$browser$Browser$Events$Event = F2(
 	function (key, event) {
 		return {event: event, key: key};
 	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$browser$Browser$Events$spawn = F3(
 	function (router, key, _v0) {
 		var node = _v0.a;
@@ -5773,12 +5622,16 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
-var $author$project$Main$subscriptions = function (model) {
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $author$project$Main$penMoveEvents = _Platform_incomingPort('penMoveEvents', $elm$json$Json$Decode$value);
+var $author$project$Main$penPredictedEvents = _Platform_incomingPort('penPredictedEvents', $elm$json$Json$Decode$value);
+var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
 				$elm$browser$Browser$Events$onResize($author$project$Main$WindowResize),
-				model.pointerDown ? $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$AnimationUpdate) : $elm$core$Platform$Sub$none
+				$author$project$Main$penMoveEvents($author$project$Main$Move),
+				$author$project$Main$penPredictedEvents($author$project$Main$Prediction)
 			]));
 };
 var $elm$core$List$append = F2(
@@ -5791,6 +5644,121 @@ var $elm$core$List$append = F2(
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$json$Json$Decode$decodeValue = _Json_run;
+var $author$project$Pointer$Event = function (pointerId) {
+	return function (width) {
+		return function (height) {
+			return function (pressure) {
+				return function (tangentialpressure) {
+					return function (tiltX) {
+						return function (tiltY) {
+							return function (twist) {
+								return function (pointerType) {
+									return function (isPrimary) {
+										return function (offsetX) {
+											return function (offsetY) {
+												return function (screenX) {
+													return function (screenY) {
+														return function (pageX) {
+															return function (pageY) {
+																return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, twist: twist, width: width};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $author$project$Pointer$andMap = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $author$project$Pointer$Mouse = {$: 'Mouse'};
+var $author$project$Pointer$Touch = {$: 'Touch'};
+var $author$project$Pointer$inputTypeFromString = function (str) {
+	switch (str) {
+		case 'touch':
+			return $author$project$Pointer$Touch;
+		case 'pen':
+			return $author$project$Pointer$Pen;
+		default:
+			return $author$project$Pointer$Mouse;
+	}
+};
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Pointer$eventDecoder = A2(
+	$author$project$Pointer$andMap,
+	A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float),
+	A2(
+		$author$project$Pointer$andMap,
+		A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
+		A2(
+			$author$project$Pointer$andMap,
+			A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float),
+			A2(
+				$author$project$Pointer$andMap,
+				A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
+				A2(
+					$author$project$Pointer$andMap,
+					A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float),
+					A2(
+						$author$project$Pointer$andMap,
+						A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
+						A2(
+							$author$project$Pointer$andMap,
+							A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
+							A2(
+								$author$project$Pointer$andMap,
+								A2(
+									$elm$json$Json$Decode$field,
+									'pointerType',
+									A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string)),
+								A2(
+									$author$project$Pointer$andMap,
+									A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float),
+									A2(
+										$author$project$Pointer$andMap,
+										A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float),
+										A2(
+											$author$project$Pointer$andMap,
+											A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
+											A2(
+												$author$project$Pointer$andMap,
+												A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float),
+												A2(
+													$author$project$Pointer$andMap,
+													A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
+													A2(
+														$author$project$Pointer$andMap,
+														A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
+														A2(
+															$author$project$Pointer$andMap,
+															A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+															A2(
+																$author$project$Pointer$andMap,
+																A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float),
+																$elm$json$Json$Decode$succeed($author$project$Pointer$Event)))))))))))))))));
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Main$unpackEvents = function (ev) {
+	var _v0 = A2(
+		$elm$json$Json$Decode$decodeValue,
+		$elm$json$Json$Decode$list($author$project$Pointer$eventDecoder),
+		ev);
+	if (_v0.$ === 'Ok') {
+		var evl = _v0.a;
+		return evl;
+	} else {
+		return _List_Nil;
+	}
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5802,67 +5770,98 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							inputType: event.pointerType,
-							lastStroke: A2(
+							currentStroke: A2(
 								$elm$core$List$append,
-								model.lastStroke,
+								model.currentStroke,
 								_List_fromArray(
 									[
 										_Utils_Tuple2(event.offsetX, event.offsetY)
 									])),
-							latestEvent: $elm$core$Maybe$Just(event),
-							offsetPos: _Utils_Tuple2(event.offsetX, event.offsetY),
-							pointerDown: true,
-							pressure: event.pressure,
-							tiltX: event.tiltX,
-							tiltY: event.tiltY
+							currentStrokeCoalesced: A2(
+								$elm$core$List$append,
+								model.currentStrokeCoalesced,
+								_List_fromArray(
+									[
+										_Utils_Tuple2(event.offsetX, event.offsetY)
+									])),
+							inputType: event.pointerType,
+							pointerDown: true
 						}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'Move':
-				var event = msg.a;
-				return _Utils_eq(event.pointerType, $author$project$Pointer$Pen) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							inputType: event.pointerType,
-							lastStroke: A2(
-								$elm$core$List$append,
-								model.lastStroke,
-								_List_fromArray(
-									[
-										_Utils_Tuple2(event.offsetX, event.offsetY)
-									])),
-							latestEvent: $elm$core$Maybe$Just(event),
-							offsetPos: _Utils_Tuple2(event.offsetX, event.offsetY),
-							pressure: event.pressure,
-							tiltX: event.tiltX,
-							tiltY: event.tiltY
-						}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				var portEvent = msg.a;
+				var _v1 = $author$project$Main$unpackEvents(portEvent);
+				if (_v1.b) {
+					var event = _v1.a;
+					var restOfEvents = _v1.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								currentStroke: A2(
+									$elm$core$List$append,
+									model.currentStroke,
+									A2(
+										$elm$core$List$map,
+										function (e) {
+											return _Utils_Tuple2(e.offsetX, e.offsetY);
+										},
+										A2($elm$core$List$cons, event, restOfEvents))),
+								currentStrokeCoalesced: function (p) {
+									return A2($elm$core$List$cons, p, model.currentStrokeCoalesced);
+								}(
+									function (e) {
+										return _Utils_Tuple2(e.offsetX, e.offsetY);
+									}(event)),
+								inputType: event.pointerType
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'Prediction':
+				var portEvent = msg.a;
+				var _v2 = $author$project$Main$unpackEvents(portEvent);
+				if (_v2.b) {
+					var event = _v2.a;
+					var restOfEvents = _v2.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								predictedStroke: A2(
+									$elm$core$List$map,
+									function (e) {
+										return _Utils_Tuple2(e.offsetX, e.offsetY);
+									},
+									A2($elm$core$List$cons, event, restOfEvents))
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 			case 'Up':
 				var event = msg.a;
 				return _Utils_eq(event.pointerType, $author$project$Pointer$Pen) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
+							currentStroke: _List_Nil,
+							currentStrokeCoalesced: _List_Nil,
 							inputType: event.pointerType,
-							lastStroke: _List_Nil,
-							latestEvent: $elm$core$Maybe$Just(event),
-							offsetPos: _Utils_Tuple2(event.offsetX, event.offsetY),
 							pointerDown: false,
-							pressure: event.pressure,
-							strokes: A2(
-								$elm$core$List$cons,
-								A2(
-									$elm$core$List$append,
-									model.lastStroke,
-									_List_fromArray(
-										[
-											_Utils_Tuple2(event.offsetX, event.offsetY)
-										])),
-								model.strokes),
-							tiltX: event.tiltX,
-							tiltY: event.tiltY
+							predictedStroke: _List_Nil,
+							strokes: _Utils_ap(
+								model.strokes,
+								_List_fromArray(
+									[
+										_Utils_ap(
+										model.currentStroke,
+										_List_fromArray(
+											[
+												_Utils_Tuple2(event.offsetX, event.offsetY)
+											]))
+									]))
 						}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'UpdateViewport':
@@ -5874,7 +5873,7 @@ var $author$project$Main$update = F2(
 						model,
 						{viewportHeight: h, viewportWidth: w}),
 					$elm$core$Platform$Cmd$none);
-			case 'WindowResize':
+			default:
 				var w = msg.a;
 				var h = msg.b;
 				return _Utils_Tuple2(
@@ -5882,16 +5881,10 @@ var $author$project$Main$update = F2(
 						model,
 						{viewportHeight: h, viewportWidth: w}),
 					$elm$core$Platform$Cmd$none);
-			default:
-				var mills = msg.a;
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$Down = function (a) {
 	return {$: 'Down', a: a};
-};
-var $author$project$Main$Move = function (a) {
-	return {$: 'Move', a: a};
 };
 var $author$project$Main$NoOp = {$: 'NoOp'};
 var $author$project$Main$Up = function (a) {
@@ -11391,6 +11384,13 @@ var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
 var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
+var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
 var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
 var $mdgriffith$elm_ui$Internal$Model$OnlyDynamic = F2(
 	function (a, b) {
@@ -11669,107 +11669,7 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
-var $author$project$Pointer$Event = function (pointerId) {
-	return function (width) {
-		return function (height) {
-			return function (pressure) {
-				return function (tangentialpressure) {
-					return function (tiltX) {
-						return function (tiltY) {
-							return function (twist) {
-								return function (pointerType) {
-									return function (isPrimary) {
-										return function (offsetX) {
-											return function (offsetY) {
-												return function (screenX) {
-													return function (screenY) {
-														return function (pageX) {
-															return function (pageY) {
-																return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, twist: twist, width: width};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var $author$project$Pointer$andMap = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $author$project$Pointer$Mouse = {$: 'Mouse'};
-var $author$project$Pointer$Touch = {$: 'Touch'};
-var $author$project$Pointer$inputTypeFromString = function (str) {
-	switch (str) {
-		case 'touch':
-			return $author$project$Pointer$Touch;
-		case 'pen':
-			return $author$project$Pointer$Pen;
-		default:
-			return $author$project$Pointer$Mouse;
-	}
-};
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Pointer$eventDecoder = A2(
-	$author$project$Pointer$andMap,
-	A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float),
-	A2(
-		$author$project$Pointer$andMap,
-		A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
-		A2(
-			$author$project$Pointer$andMap,
-			A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float),
-			A2(
-				$author$project$Pointer$andMap,
-				A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
-				A2(
-					$author$project$Pointer$andMap,
-					A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float),
-					A2(
-						$author$project$Pointer$andMap,
-						A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
-						A2(
-							$author$project$Pointer$andMap,
-							A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
-							A2(
-								$author$project$Pointer$andMap,
-								A2(
-									$elm$json$Json$Decode$field,
-									'pointerType',
-									A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string)),
-								A2(
-									$author$project$Pointer$andMap,
-									A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float),
-									A2(
-										$author$project$Pointer$andMap,
-										A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float),
-										A2(
-											$author$project$Pointer$andMap,
-											A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
-											A2(
-												$author$project$Pointer$andMap,
-												A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float),
-												A2(
-													$author$project$Pointer$andMap,
-													A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
-													A2(
-														$author$project$Pointer$andMap,
-														A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
-														A2(
-															$author$project$Pointer$andMap,
-															A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
-															A2(
-																$author$project$Pointer$andMap,
-																A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float),
-																$elm$json$Json$Decode$succeed($author$project$Pointer$Event)))))))))))))))));
+var $elm$svg$Svg$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -11788,403 +11688,68 @@ var $author$project$Pointer$on = F2(
 			A2($elm$json$Json$Decode$map, tag, $author$project$Pointer$eventDecoder));
 	});
 var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
-var $author$project$Pointer$onMove = $author$project$Pointer$on('pointermove');
 var $author$project$Pointer$onUp = $author$project$Pointer$on('pointerup');
-var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
-var $mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
-};
-var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
-	function (a, b, c) {
-		return {$: 'SpacingStyle', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$spacing = $mdgriffith$elm_ui$Internal$Flag$flag(3);
-var $mdgriffith$elm_ui$Internal$Model$spacingName = F2(
-	function (x, y) {
-		return 'spacing-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y)));
-	});
-var $mdgriffith$elm_ui$Element$spacing = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$spacing,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
-			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
-			x,
-			x));
-};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Main$add = F2(
-	function (_v0, _v1) {
-		var a1 = _v0.a;
-		var a2 = _v0.b;
-		var b1 = _v1.a;
-		var b2 = _v1.b;
-		var y = a2 + b2;
-		var x = a1 + b1;
-		return _Utils_Tuple2(x, y);
-	});
-var $author$project$Main$multiply = F2(
-	function (_v0, s) {
-		var a1 = _v0.a;
-		var a2 = _v0.b;
-		return _Utils_Tuple2(s * a1, s * a2);
-	});
-var $author$project$Main$dotProduct = F2(
-	function (_v0, _v1) {
-		var a1 = _v0.a;
-		var a2 = _v0.b;
-		var b1 = _v1.a;
-		var b2 = _v1.b;
-		return (a1 * b1) + (a2 * b2);
-	});
-var $elm$core$Basics$pow = _Basics_pow;
-var $author$project$Main$length2 = function (_v0) {
-	var a1 = _v0.a;
-	var a2 = _v0.b;
-	return A2($elm$core$Basics$pow, a1, 2) + A2($elm$core$Basics$pow, a2, 2);
-};
-var $author$project$Main$proj = F2(
-	function (a, b) {
-		return A2(
-			$author$project$Main$multiply,
-			b,
-			A2($author$project$Main$dotProduct, a, b) / $author$project$Main$length2(b));
-	});
-var $author$project$Main$subtract = F2(
-	function (_v0, _v1) {
-		var a1 = _v0.a;
-		var a2 = _v0.b;
-		var b1 = _v1.a;
-		var b2 = _v1.b;
-		var y = b2 - a2;
-		var x = b1 - a1;
-		return _Utils_Tuple2(x, y);
-	});
-var $author$project$Main$rel = F2(
-	function (a, b) {
-		return A2($author$project$Main$subtract, b, a);
-	});
-var $author$project$Main$cubicControlPoints = F3(
-	function (pre, base, next) {
-		var smoothing = 0.4;
-		var b = function (p) {
-			return A2($author$project$Main$multiply, p, smoothing);
-		}(
-			A2(
-				$author$project$Main$proj,
-				A2($author$project$Main$rel, next, base),
-				A2($author$project$Main$rel, pre, next)));
-		var a = function (p) {
-			return A2($author$project$Main$multiply, p, smoothing);
-		}(
-			A2(
-				$author$project$Main$proj,
-				A2($author$project$Main$rel, pre, base),
-				A2($author$project$Main$rel, pre, next)));
-		return _Utils_Tuple2(
-			A2($author$project$Main$add, base, a),
-			A2($author$project$Main$add, base, b));
-	});
-var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$List$map3 = _List_map3;
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $author$project$Main$pointToString = function (_v0) {
-	var x1 = _v0.a;
-	var y1 = _v0.b;
-	return '' + ($elm$core$String$fromFloat(x1) + (' ' + ($elm$core$String$fromFloat(y1) + ' ')));
-};
+var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
-var $elm$core$List$unzip = function (pairs) {
-	var step = F2(
-		function (_v0, _v1) {
-			var x = _v0.a;
-			var y = _v0.b;
-			var xs = _v1.a;
-			var ys = _v1.b;
-			return _Utils_Tuple2(
-				A2($elm$core$List$cons, x, xs),
-				A2($elm$core$List$cons, y, ys));
-		});
-	return A3(
-		$elm$core$List$foldr,
-		step,
-		_Utils_Tuple2(_List_Nil, _List_Nil),
-		pairs);
+var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
+var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $author$project$Main$svgPolylineStringFromPoints = function (points) {
+	return $elm$core$String$concat(
+		A2(
+			$elm$core$List$map,
+			function (p) {
+				return ($elm$core$String$fromFloat(p.a) + ',') + ($elm$core$String$fromFloat(p.b) + ' ');
+			},
+			points));
 };
-var $author$project$Main$cubicSpline = function (points) {
-	var nextPoints = A2($elm$core$List$drop, 2, points);
-	var basePoints = A2($elm$core$List$drop, 1, points);
-	var _v0 = function () {
-		if (points.b) {
-			var a = points.a;
-			var b = points.b;
-			return _Utils_Tuple2(
-				$author$project$Main$pointToString(a),
-				b);
-		} else {
-			return _Utils_Tuple2('', _List_Nil);
-		}
-	}();
-	var point1 = _v0.a;
-	var tailPoints = _v0.b;
-	var _v2 = $elm$core$List$unzip(
-		A4($elm$core$List$map3, $author$project$Main$cubicControlPoints, points, basePoints, nextPoints));
-	var cp2 = _v2.a;
-	var cp1 = _v2.b;
-	var c1 = _Utils_ap(
-		A2($elm$core$List$take, 1, points),
-		cp1);
-	var c2 = $elm$core$List$reverse(
-		_Utils_ap(
-			A2(
-				$elm$core$List$take,
-				1,
-				$elm$core$List$reverse(tailPoints)),
-			$elm$core$List$reverse(cp2)));
-	var pathPointsString = $elm$core$String$concat(
-		_List_fromArray(
-			[
-				'M' + point1,
-				'C',
-				$elm$core$String$concat(
-				A4(
-					$elm$core$List$map3,
-					F3(
-						function (a, b, c) {
-							return _Utils_ap(
-								$author$project$Main$pointToString(a),
-								_Utils_ap(
-									$author$project$Main$pointToString(b),
-									$author$project$Main$pointToString(c)));
-						}),
-					c1,
-					c2,
-					tailPoints))
-			]));
+var $author$project$Main$stroke = function (points) {
 	return A2(
-		$elm$svg$Svg$path,
+		$elm$svg$Svg$polyline,
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$fill('none'),
-				$elm$svg$Svg$Attributes$stroke('blue'),
-				$elm$svg$Svg$Attributes$d(pathPointsString)
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$strokeWidth('2'),
+				$elm$svg$Svg$Attributes$strokeLinecap('round'),
+				$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+				$elm$svg$Svg$Attributes$points(
+				$author$project$Main$svgPolylineStringFromPoints(points))
 			]),
 		_List_Nil);
 };
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
-var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $author$project$Main$svgPoint = function (point) {
-	return A2(
-		$elm$svg$Svg$circle,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$cx(
-				$elm$core$String$fromFloat(point.a)),
-				$elm$svg$Svg$Attributes$cy(
-				$elm$core$String$fromFloat(point.b)),
-				$elm$svg$Svg$Attributes$r('2')
-			]),
-		_List_Nil);
-};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$svgCanvas = function (model) {
-	var width = $elm$core$String$fromFloat(model.viewportWidth - 40);
-	var height = $elm$core$String$fromFloat(model.viewportHeight - 40);
-	var halfWidth = $elm$core$String$fromFloat((model.viewportWidth - 40) / 2);
-	var halfHeight = $elm$core$String$fromFloat((model.viewportHeight - 40) / 2);
-	return $mdgriffith$elm_ui$Element$html(
-		A2(
-			$elm$svg$Svg$svg,
+	var width = $elm$core$String$fromFloat(model.viewportWidth - 30);
+	var height = $elm$core$String$fromFloat(model.viewportHeight - 30);
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$width(width),
+				$elm$svg$Svg$Attributes$height(height),
+				$elm$svg$Svg$Attributes$viewBox('' + ('0' + (' ' + ('0' + (' ' + (width + (' ' + height))))))),
+				$elm$svg$Svg$Attributes$id('sketchspace')
+			]),
+		$elm$core$List$concat(
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$width(width),
-					$elm$svg$Svg$Attributes$height(height),
-					$elm$svg$Svg$Attributes$viewBox('' + ('-' + (halfWidth + (' ' + ('-' + (halfHeight + (halfWidth + (' ' + halfHeight))))))))
-				]),
-			$elm$core$List$concat(
-				_List_fromArray(
+					A2($elm$core$List$map, $author$project$Main$stroke, model.strokes),
+					_List_fromArray(
 					[
-						_List_fromArray(
-						[
-							$author$project$Main$cubicSpline(model.lastStroke)
-						]),
-						A2($elm$core$List$map, $author$project$Main$cubicSpline, model.strokes),
-						A2(
-						$elm$core$List$map,
-						$author$project$Main$svgPoint,
-						$elm$core$List$concat(model.strokes))
-					]))));
+						$author$project$Main$stroke(
+						_Utils_ap(model.currentStroke, model.predictedStroke))
+					])
+				])));
 };
 var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
 	function (a, b, c, d, e) {
@@ -12209,7 +11774,6 @@ var $author$project$Main$view = function (model) {
 			[
 				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
 				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$padding(10),
 				$mdgriffith$elm_ui$Element$htmlAttribute(
 				A2($elm$html$Html$Attributes$style, 'touch-action', 'none')),
 				$mdgriffith$elm_ui$Element$htmlAttribute(
@@ -12218,28 +11782,25 @@ var $author$project$Main$view = function (model) {
 		A2(
 			$mdgriffith$elm_ui$Element$column,
 			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$centerY,
-					$mdgriffith$elm_ui$Element$spacing(7)
-				]),
+				[$mdgriffith$elm_ui$Element$centerX, $mdgriffith$elm_ui$Element$centerY]),
 			_List_fromArray(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$el,
 					_List_fromArray(
 						[
-							$mdgriffith$elm_ui$Element$Border$width(1),
+							$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+							$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+							$mdgriffith$elm_ui$Element$Border$width(3),
 							$mdgriffith$elm_ui$Element$htmlAttribute(
 							$author$project$Pointer$onDown($author$project$Main$Down)),
-							$mdgriffith$elm_ui$Element$htmlAttribute(
-							$author$project$Pointer$onMove($author$project$Main$Move)),
 							$mdgriffith$elm_ui$Element$htmlAttribute(
 							$author$project$Pointer$onUp($author$project$Main$Up)),
 							$mdgriffith$elm_ui$Element$htmlAttribute(
 							$author$project$Main$blockContextMenu($author$project$Main$NoOp))
 						]),
-					$author$project$Main$svgCanvas(model))
+					$mdgriffith$elm_ui$Element$html(
+						A2($elm$svg$Svg$Lazy$lazy, $author$project$Main$svgCanvas, model)))
 				])));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
@@ -12247,7 +11808,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 		init: $elm$core$Basics$always($author$project$Main$init),
 		subscriptions: $author$project$Main$subscriptions,
 		update: $author$project$Main$update,
-		view: $author$project$Main$view
+		view: $elm$html$Html$Lazy$lazy($author$project$Main$view)
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

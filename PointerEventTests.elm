@@ -91,6 +91,7 @@ view model =
         (column
             [ padding 20
             , spacing 20
+            , width fill
             ]
             [ text "Pointer Events v2 Test"
 
@@ -182,10 +183,6 @@ view model =
                         (\p -> text <| String.fromFloat p.width)
                     ]
                 }
-            , paragraph
-                []
-                [ text (Debug.toString model)
-                ]
             ]
         )
 

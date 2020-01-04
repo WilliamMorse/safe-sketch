@@ -1,4 +1,4 @@
-module Pointer exposing (DeviceType(..), Event, onDown, onMove, onUp)
+module Pointer exposing (DeviceType(..), Event, blockContextMenu, eventDecoder, onDown, onMove, onUp)
 
 import Html
 import Html.Events
@@ -97,3 +97,10 @@ onMove =
 onUp : (Event -> msg) -> Html.Attribute msg
 onUp =
     on "pointerup"
+
+
+blockContextMenu : msg -> Html.Attribute msg
+blockContextMenu msg =
+    Html.Events.preventDefaultOn
+        "contextmenu"
+        (Decode.map (\m -> ( m, True )) (Decode.succeed msg))
