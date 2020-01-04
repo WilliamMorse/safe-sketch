@@ -20,7 +20,10 @@ import Svg.Lazy as So
 import Task
 
 
-port moveEvent : (Encode.Value -> msg) -> Sub msg
+port penMoveEvents : (Encode.Value -> msg) -> Sub msg
+
+
+port penPredictedEvents : (Encode.Value -> msg) -> Sub msg
 
 
 main : Program () Model Msg
@@ -41,11 +44,11 @@ type alias Model =
     { inputType : DeviceType
     , pointerDown : Bool
     , currentStroke : List Point
+    , predictedStroke : List Point
     , currentStrokeCoalesced : List Point
     , strokes : List (List Point)
     , viewportHeight : Float
     , viewportWidth : Float
-    , controlPoints : List (List Point)
     }
 
 
@@ -54,13 +57,13 @@ init =
     ( { inputType = Pointer.Pen
       , pointerDown = False
       , currentStroke = []
+      , predictedStroke = []
       , currentStrokeCoalesced = []
 
       -- hadcoded some starting strokes to test the smoothing
       , strokes = [] --[ [ ( 100, 100 ), ( 500, 500 ), ( 100, 600 ), ( 200, 600 ) ] ]
-      , viewportHeight = 10
-      , viewportWidth = 10
-      , controlPoints = [ [] ]
+      , viewportHeight = 30
+      , viewportWidth = 30
       }
     , Task.perform UpdateViewport Browser.Dom.getViewport
     )
@@ -69,8 +72,8 @@ init =
 type Msg
     = NoOp
     | Down Pointer.Event
-    | Move Pointer.Event
-    | FillIn Value
+    | Move Value
+    | Prediction Value
     | Up Pointer.Event
     | UpdateViewport Browser.Dom.Viewport
     | WindowResize Int Int
@@ -80,12 +83,13 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Be.onResize WindowResize
-        , moveEvent FillIn
+        , penMoveEvents Move
+        , penPredictedEvents Prediction
         ]
 
 
-flattenCoalescedEvents : Value -> List Event
-flattenCoalescedEvents ev =
+unpackEvents : Value -> List Event
+unpackEvents ev =
     case Decode.decodeValue (Decode.list eventDecoder) ev of
         Ok evl ->
             evl
@@ -106,6 +110,7 @@ update msg model =
                     | pointerDown = True
                     , inputType = event.pointerType
                     , currentStroke = List.append model.currentStroke [ ( event.offsetX, event.offsetY ) ]
+                    , currentStrokeCoalesced = List.append model.currentStrokeCoalesced [ ( event.offsetX, event.offsetY ) ]
                   }
                 , Cmd.none
                 )
@@ -113,38 +118,38 @@ update msg model =
             else
                 ( model, Cmd.none )
 
-        Move event ->
-            if event.pointerType == Pointer.Pen then
-                ( { model
-                    | currentStroke = List.append model.currentStroke [ ( event.offsetX, event.offsetY ) ]
-                  }
-                , Cmd.none
-                )
-
-            else
-                ( model, Cmd.none )
-
-        FillIn portEvent ->
-            case flattenCoalescedEvents portEvent of
+        Move portEvent ->
+            case unpackEvents portEvent of
                 event :: restOfEvents ->
-                    if event.pointerType == Pointer.Pen then
-                        ( { model
-                            | inputType = event.pointerType
-                            , currentStroke =
-                                event
-                                    :: restOfEvents
-                                    |> List.map (\e -> ( e.offsetX, e.offsetY ))
-                                    |> List.append model.currentStroke
-                            , currentStrokeCoalesced =
-                                event
-                                    |> (\e -> ( e.offsetX, e.offsetY ))
-                                    |> (\p -> p :: model.currentStrokeCoalesced)
-                          }
-                        , Cmd.none
-                        )
+                    ( { model
+                        | inputType = event.pointerType
+                        , currentStroke =
+                            event
+                                :: restOfEvents
+                                |> List.map (\e -> ( e.offsetX, e.offsetY ))
+                                |> List.append model.currentStroke
+                        , currentStrokeCoalesced =
+                            event
+                                |> (\e -> ( e.offsetX, e.offsetY ))
+                                |> (\p -> p :: model.currentStrokeCoalesced)
+                      }
+                    , Cmd.none
+                    )
 
-                    else
-                        ( model, Cmd.none )
+                [] ->
+                    ( model, Cmd.none )
+
+        Prediction portEvent ->
+            case unpackEvents portEvent of
+                event :: restOfEvents ->
+                    ( { model
+                        | predictedStroke =
+                            event
+                                :: restOfEvents
+                                |> List.map (\e -> ( e.offsetX, e.offsetY ))
+                      }
+                    , Cmd.none
+                    )
 
                 [] ->
                     ( model, Cmd.none )
@@ -152,12 +157,15 @@ update msg model =
         Up event ->
             if event.pointerType == Pointer.Pen then
                 ( { model
+                    -- Now that we have render time, update the view with the denser stroke points
                     | strokes =
-                        List.append model.currentStroke
-                            [ ( event.offsetX, event.offsetY ) ]
-                            :: model.strokes
+                        model.strokes
+                            ++ [ model.currentStroke
+                                    ++ [ ( event.offsetX, event.offsetY ) ]
+                               ]
                     , currentStrokeCoalesced = []
                     , currentStroke = []
+                    , predictedStroke = []
                     , pointerDown = False
                     , inputType = event.pointerType
                   }
@@ -193,7 +201,6 @@ view model =
     Element.layout
         [ width fill
         , height fill
-        , padding 10
         , htmlAttribute <| Html.Attributes.style "touch-action" "none"
         , htmlAttribute <| Html.Attributes.style "user-select" "none"
         ]
@@ -201,25 +208,16 @@ view model =
         column
             [ centerX
             , centerY
-            , spacing 7
             ]
             [ el
-                [ Border.width 1
-                , width fill
+                [ width fill
                 , height fill
+                , Border.width 3
                 , htmlAttribute <| Pointer.onDown Down
-
-                --, htmlAttribute <| Pointer.onMove Move
                 , htmlAttribute <| Pointer.onUp Up
                 , htmlAttribute <| blockContextMenu NoOp
                 ]
                 (html <| So.lazy svgCanvas model)
-
-            {--}
-            , text <| "width = " ++ String.fromFloat model.viewportWidth
-            , text <| "height = " ++ String.fromFloat model.viewportHeight
-
-            --}
             ]
 
 
@@ -229,6 +227,7 @@ svgPoint ( x, y ) =
         [ Sa.cx <| String.fromFloat x
         , Sa.cy <| String.fromFloat y
         , Sa.r "2"
+        , Sa.fill "grey"
         ]
         []
 
@@ -519,8 +518,10 @@ stroke : List Point -> S.Svg Msg
 stroke points =
     S.polyline
         [ Sa.fill "none"
-        , Sa.stroke "grey"
-        , Sa.strokeWidth "4"
+        , Sa.stroke "black"
+        , Sa.strokeWidth "2"
+        , Sa.strokeLinecap "round"
+        , Sa.strokeLinejoin "round"
         , Sa.points (svgPolylineStringFromPoints points)
         ]
         []
@@ -530,10 +531,10 @@ svgCanvas : Model -> Svg Msg
 svgCanvas model =
     let
         width =
-            String.fromFloat <| model.viewportWidth - 40
+            String.fromFloat <| model.viewportWidth - 30
 
         height =
-            String.fromFloat <| model.viewportHeight - 40
+            String.fromFloat <| model.viewportHeight - 30
     in
     S.svg
         [ Sa.width width
@@ -547,10 +548,14 @@ svgCanvas model =
                 ++ width
                 ++ " "
                 ++ height
+        , Sa.id "sketchspace"
         ]
         (List.concat
             [ List.map stroke model.strokes
-            , [ stroke model.currentStrokeCoalesced ]
+            , [ stroke (model.currentStroke ++ model.predictedStroke) ]
+
+            -- , [ stroke model.predictedStroke ]
+            --, List.map svgPoint model.predictedStroke
             ]
         )
 

@@ -2,38 +2,43 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Main</title>
+    <title>safe sketch</title>
     <script src="elm.js"></script>
   </head>
 
   <body>
-    <div id="lowtest">
-      <div id="elm"></div>
-    </div>
+    <div id="elm"></div>
     <script>
-  var app = Elm.Main.init({
-    node: document.getElementById('elm')
-  });
+      var app = Elm.Main.init({
+        node: document.getElementById("elm")
+      });
 
-  function eventHandeler(e) {
-    // Feature detection for getCoalescedEvents as it was introduced in PointerEvents V3
-    if (e.getCoalescedEvents) {
-      console.log("coal", e.getCoalescedEvents().length)
-      //for (let coalesced_event of e.getCoalescedEvents())
-        //{
-       //   app.ports.moveEvent.send(coalesced_event);
-       // }
-      app.ports.moveEvent.send(e.getCoalescedEvents())
-    }
-    else {
-      app.ports.moveEvent.send([e]);
+      function moveEventHandeler(event) {
+        if (event.pointerType == "pen") { // Feature detection for getCoalescedEvents in PointerEvents V3
+
+          if (event.getCoalescedEvents ) {
+            //console.log("coal", event.getCoalescedEvents().length)
+            app.ports.penMoveEvents.send(event.getCoalescedEvents())
+
+            if (event.getPredictedEvents) {
+              //console.log("pre", event.getPredictedEvents().length)
+              app.ports.penPredictedEvents.send(event.getPredictedEvents())
+            }
+            
+          }
+          else {
+            // fallback for non coalesced event support
+            app.ports.penMoveEvents.send([event]);
+            }
+          
+        }
       }
-  }
 
-  document.addEventListener('DOMContentLoaded', function () {
-      var canvas = document.getElementById("lowtest")
-      canvas.addEventListener("pointermove", eventHandeler);
-  });
+      document.addEventListener("DOMContentLoaded", function () {
+          console.log("DOMLoaded")
+          var canvas = document.getElementById("sketchspace")
+          canvas.addEventListener("pointermove",  moveEventHandeler );
+      });
   
 
   
