@@ -1,4 +1,4 @@
-module Tilt exposing (Cartesian, Spherical, Tilt, toCartesian, toSpherical)
+module Vector exposing (Cartesian, Spherical, Tilt, toCartesian, toSpherical)
 
 
 type alias Tilt =
