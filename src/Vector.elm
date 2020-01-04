@@ -1,74 +1,90 @@
-module Vector exposing (Cartesian, Spherical, Tilt, toCartesian, toSpherical)
+module Vector exposing (Point, add, distanceBetween, dotProduct, length, length2, multiply, norm, norm2, proj, projL, rel, subtract)
+
+{-| A 2d vector module for calculating spline control points
+-}
 
 
-type alias Tilt =
-    { r : Float
-    , x : Float
-    , y : Float
-    }
+type alias Point =
+    ( Float, Float )
 
 
-type alias Cartesian =
-    { x : Float
-    , y : Float
-    , z : Float
-    }
-
-
-type alias Spherical =
-    { r : Float
-    , theta : Float
-    , phi : Float
-    }
-
-
-radToDec : Float -> Float
-radToDec rad =
-    rad * 1
-
-
-
---(180 / pi)
-
-
-toCartesian : Tilt -> Cartesian
-toCartesian tilt =
+add : Point -> Point -> Point
+add ( a1, a2 ) ( b1, b2 ) =
     let
-        -- These come from the cross product of
-        -- the two normal vetors from the two
-        -- tilt planes
         x =
-            sin tilt.x * cos tilt.y
+            a1 + b1
 
         y =
-            cos tilt.x * sin tilt.y
-
-        z =
-            cos tilt.x * cos tilt.y
-
-        norm =
-            sqrt (x ^ 2 + y ^ 2 + z ^ 2)
+            a2 + b2
     in
-    Cartesian (x / norm) (y / norm) (z / norm)
+    ( x, y )
 
 
-cartiesian_to_spherical : Cartesian -> Spherical
-cartiesian_to_spherical cart =
+subtract : Point -> Point -> Point
+subtract ( a1, a2 ) ( b1, b2 ) =
     let
-        r =
-            sqrt (cart.x ^ 2 + cart.y ^ 2 + cart.z ^ 2)
+        x =
+            b1 - a1
 
-        theta =
-            radToDec <| atan2 (sqrt (cart.x ^ 2 + cart.y ^ 2)) cart.z
-
-        phi =
-            radToDec <| atan2 cart.y cart.x
+        y =
+            b2 - a2
     in
-    Spherical r theta phi
+    ( x, y )
 
 
-toSpherical : Tilt -> Spherical
-toSpherical tilt =
-    tilt
-        |> toCartesian
-        |> cartiesian_to_spherical
+multiply : Point -> Float -> Point
+multiply ( a1, a2 ) s =
+    ( s * a1, s * a2 )
+
+
+{-| Subtracts the second point from the first point vectorially
+-}
+dotProduct : Point -> Point -> Float
+dotProduct ( a1, a2 ) ( b1, b2 ) =
+    a1 * b1 + a2 * b2
+
+
+length2 : Point -> Float
+length2 ( a1, a2 ) =
+    a1 ^ 2 + a2 ^ 2
+
+
+length : Point -> Float
+length a =
+    length2 a ^ 0.5
+
+
+distanceBetween : Point -> Point -> Float
+distanceBetween a b =
+    length <| subtract a b
+
+
+{-| Finds the relative vector from a to b
+-}
+rel : Point -> Point -> Point
+rel a b =
+    subtract b a
+
+
+norm : Point -> Point
+norm a =
+    multiply a (length a ^ -1)
+
+
+norm2 : Point -> Point
+norm2 a =
+    multiply a (length2 a ^ -1)
+
+
+{-| Project a onto b and return a vector
+-}
+proj : Point -> Point -> Point
+proj a b =
+    multiply
+        b
+        (dotProduct a b / length2 b)
+
+
+projL : Point -> Point -> Float
+projL a b =
+    dotProduct a b / length b

@@ -1,23 +1,22 @@
-port module Main exposing (Model, Msg(..), Point, blockContextMenu, init, main, svgCanvas, update, view)
+port module Main exposing (Model, Msg(..), init, main, penMoveEvents, penPredictedEvents, pointToString, stroke, subscriptions, svgCanvas, svgPoint, svgPolylineStringFromPoints, unpackEvents, update, view)
 
 import Browser
-import Browser.Dom exposing (Viewport)
+import Browser.Dom
 import Browser.Events as Be
 import Element exposing (..)
 import Element.Border as Border
-import Element.Lazy as Soso
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Html.Lazy
-import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode as Decode exposing (Value)
 import Json.Encode as Encode
-import Pointer exposing (DeviceType, Event, eventDecoder, onDown, onUp)
+import Pointer exposing (DeviceType, Event, blockContextMenu, eventDecoder, onDown, onUp)
 import Svg as S exposing (Svg)
 import Svg.Attributes as Sa
-import Svg.Keyed as Keyed
 import Svg.Lazy as So
 import Task
+import Vector as Vector exposing (Point)
 
 
 port penMoveEvents : (Encode.Value -> msg) -> Sub msg
@@ -34,10 +33,6 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
-
-type alias Point =
-    ( Float, Float )
 
 
 type alias Model =
@@ -189,13 +184,6 @@ update msg model =
             ( { model | viewportWidth = toFloat w, viewportHeight = toFloat h }, Cmd.none )
 
 
-blockContextMenu : Msg -> Html.Attribute Msg
-blockContextMenu msg =
-    Html.Events.preventDefaultOn
-        "contextmenu"
-        (Decode.map (\m -> ( m, True )) (Decode.succeed msg))
-
-
 view : Model -> Html Msg
 view model =
     Element.layout
@@ -232,285 +220,17 @@ svgPoint ( x, y ) =
         []
 
 
-add : Point -> Point -> Point
-add ( a1, a2 ) ( b1, b2 ) =
-    let
-        x =
-            a1 + b1
-
-        y =
-            a2 + b2
-    in
-    ( x, y )
-
-
-subtract : Point -> Point -> Point
-subtract ( a1, a2 ) ( b1, b2 ) =
-    let
-        x =
-            b1 - a1
-
-        y =
-            b2 - a2
-    in
-    ( x, y )
-
-
-multiply : Point -> Float -> Point
-multiply ( a1, a2 ) s =
-    ( s * a1, s * a2 )
-
-
-{-| Subtracts the second point from the first point vectorially
--}
-dotProduct : Point -> Point -> Float
-dotProduct ( a1, a2 ) ( b1, b2 ) =
-    a1 * b1 + a2 * b2
-
-
-length2 : Point -> Float
-length2 ( a1, a2 ) =
-    a1 ^ 2 + a2 ^ 2
-
-
-length : Point -> Float
-length a =
-    length2 a ^ 0.5
-
-
-distanceBetween : Point -> Point -> Float
-distanceBetween a b =
-    length <| subtract a b
-
-
-{-| Finds the relative vector from a to b
--}
-rel : Point -> Point -> Point
-rel a b =
-    subtract b a
-
-
-norm : Point -> Point
-norm a =
-    multiply a (length a ^ -1)
-
-
-norm2 : Point -> Point
-norm2 a =
-    multiply a (length2 a ^ -1)
-
-
-{-| Project a onto b and return a vector
--}
-proj : Point -> Point -> Point
-proj a b =
-    multiply
-        b
-        (dotProduct a b / length2 b)
-
-
-projL : Point -> Point -> Float
-projL a b =
-    dotProduct a b / length b
-
-
-quadradicControlPoints : Point -> Point -> Point -> Point
-quadradicControlPoints pre base next =
-    -- Take the bisector of the incoming and outgoing vectors
-    let
-        smoothing =
-            0.4
-
-        a =
-            norm <| rel base pre
-
-        b =
-            norm <| rel base next
-
-        tangent =
-            subtract a b
-    in
-    add base (multiply tangent smoothing)
-
-
-cubicControlPoints : Point -> Point -> Point -> ( Point, Point )
-cubicControlPoints pre base next =
-    let
-        smoothing =
-            0.4
-
-        a =
-            rel pre next
-                |> proj (rel pre base)
-                |> (\p -> multiply p smoothing)
-
-        b =
-            rel pre next
-                |> proj (rel next base)
-                |> (\p -> multiply p smoothing)
-    in
-    ( add base a, add base b )
-
-
-cubicSpline : List Point -> S.Svg Msg
-cubicSpline points =
-    let
-        basePoints =
-            List.drop 1 points
-
-        nextPoints =
-            List.drop 2 points
-
-        -- m starting point
-        -- S (curve to) second point2 + c1
-        -- C c2 c3 point 2
-        ( point1, tailPoints ) =
-            case points of
-                a :: b ->
-                    ( pointToString a, b )
-
-                [] ->
-                    ( "", [] )
-
-        ( cp2, cp1 ) =
-            List.map3 cubicControlPoints points basePoints nextPoints
-                |> List.unzip
-
-        c1 =
-            List.take 1 points ++ cp1
-
-        c2 =
-            cp2
-                |> List.reverse
-                |> (++) (List.take 1 (List.reverse tailPoints))
-                |> List.reverse
-
-        pathPointsString =
-            String.concat
-                [ "M" ++ point1
-                , "C"
-                , List.map3
-                    (\a b c ->
-                        pointToString a
-                            ++ pointToString b
-                            ++ pointToString c
-                    )
-                    c1
-                    c2
-                    tailPoints
-                    |> String.concat
-                ]
-    in
-    S.path
-        [ Sa.fill "none"
-        , Sa.stroke "blue"
-        , Sa.d pathPointsString
-        ]
-        []
-
-
-normWithScaling : Float -> Point -> ( Point, Point ) -> Point
-normWithScaling smoothing basePoint ( a, b ) =
-    let
-        c =
-            distanceBetween a b
-
-        ( ( x1, y1 ), ( x2, y2 ) ) =
-            ( a, b )
-
-        ( x3, y3 ) =
-            basePoint
-    in
-    ( x3
-        - ((x2 - x1) * (smoothing * c / 900))
-    , y3
-        - ((y2 - y1) * (smoothing * c / 900))
-    )
-
-
 pointToString : Point -> String
-pointToString ( x1, y1 ) =
-    ""
-        ++ String.fromFloat x1
-        ++ " "
-        ++ String.fromFloat y1
-        ++ " "
-
-
-myS : Point -> Point -> String
-myS perce control =
-    "S"
-        ++ pointToString control
-        ++ pointToString perce
-
-
-points_to_smooth_svg_path : List Point -> Float -> String
-points_to_smooth_svg_path points smoothingFactor =
-    -- makes the args to the svg path command following this algo:
-    -- https://medium.com/@francoisromain/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
-    let
-        -- these are the points with bezier controll points ascoceated with them
-        basePoints =
-            List.drop 1 points
-
-        -- combined with the normal points we use these to define the tangents at each base point
-        gashiftedPoints =
-            List.drop 2 points
-
-        --  map2 will truncate the longer list
-        pointPairs =
-            List.map2 Tuple.pair points gashiftedPoints
-
-        bezierControllPoints =
-            List.map2 (normWithScaling smoothingFactor) basePoints pointPairs
-
-        firstPoint =
-            let
-                point =
-                    case List.head points of
-                        Just p ->
-                            p
-
-                        Nothing ->
-                            ( 0, 0 )
-            in
-            "M" ++ pointToString point
-
-        subsequentPoints =
-            List.map2 myS basePoints bezierControllPoints
-
-        lastPoint =
-            case List.reverse points of
-                [] ->
-                    ""
-
-                l :: _ ->
-                    -- finish the path with a zero length control point
-                    myS l l
-    in
-    [ [ firstPoint ], subsequentPoints, [ lastPoint ] ]
-        |> List.concat
-        |> String.join " "
-
-
-smoothStroke : List Point -> S.Svg Msg
-smoothStroke points =
-    S.path
-        [ Sa.fill "none"
-        , Sa.stroke "green"
-        , Sa.d (points_to_smooth_svg_path points 1)
-        ]
-        []
+pointToString ( x, y ) =
+    String.append
+        (String.fromFloat x ++ ",")
+        (String.fromFloat y ++ " ")
 
 
 svgPolylineStringFromPoints : List Point -> String
 svgPolylineStringFromPoints points =
     points
-        |> List.map
-            (\p ->
-                (String.fromFloat (Tuple.first p) ++ ",")
-                    ++ (String.fromFloat (Tuple.second p) ++ " ")
-            )
+        |> List.map pointToString
         |> String.concat
 
 
@@ -553,33 +273,5 @@ svgCanvas model =
         (List.concat
             [ List.map stroke model.strokes
             , [ stroke (model.currentStroke ++ model.predictedStroke) ]
-
-            -- , [ stroke model.predictedStroke ]
-            --, List.map svgPoint model.predictedStroke
             ]
         )
-
-
-
-{--
-    So.lazy3 Keyed.node
-        "paper"
-        [ Sa.width width
-        , Sa.height height
-        , Sa.viewBox <|
-            ""
-                ++ "0"
-                ++ " "
-                ++ "0"
-                ++ " "
-                ++ width
-                ++ " "
-                ++ height
-        ]
-        (List.concat
-            [ List.map svgPoint (List.concat model.strokes)
-            , List.map svgPoint model.currentStroke
-            ]
-            |> List.indexedMap (\i p -> ( String.fromInt i, p ))
-        )
---}
