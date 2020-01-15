@@ -11719,6 +11719,26 @@ var $author$project$Main$stroke = function (points) {
 		_List_Nil);
 };
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $author$project$Main$svgPoint = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return A2(
+		$elm$svg$Svg$circle,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$cx(
+				$elm$core$String$fromFloat(x)),
+				$elm$svg$Svg$Attributes$cy(
+				$elm$core$String$fromFloat(y)),
+				$elm$svg$Svg$Attributes$r('2'),
+				$elm$svg$Svg$Attributes$fill('red')
+			]),
+		_List_Nil);
+};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$svgCanvas = function (model) {
@@ -11739,9 +11759,9 @@ var $author$project$Main$svgCanvas = function (model) {
 					A2($elm$core$List$map, $author$project$Main$stroke, model.strokes),
 					_List_fromArray(
 					[
-						$author$project$Main$stroke(
-						_Utils_ap(model.currentStroke, model.predictedStroke))
-					])
+						$author$project$Main$stroke(model.currentStroke)
+					]),
+					A2($elm$core$List$map, $author$project$Main$svgPoint, model.predictedStroke)
 				])));
 };
 var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(

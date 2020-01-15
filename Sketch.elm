@@ -36,7 +36,6 @@ type alias Model =
     , pointerDown : Bool
     , currentStroke : List Point
     , predictedStroke : List Point
-    , currentStrokeCoalesced : List Point
     , strokes : List (List Point)
     , viewportHeight : Float
     , viewportWidth : Float
@@ -49,10 +48,7 @@ init =
       , pointerDown = False
       , currentStroke = []
       , predictedStroke = []
-      , currentStrokeCoalesced = []
-
-      -- hadcoded some starting strokes to test the smoothing
-      , strokes = [] --[ [ ( 100, 100 ), ( 500, 500 ), ( 100, 600 ), ( 200, 600 ) ] ]
+      , strokes = [] --[ [ ( 100, 100 ), ( 500, 500 ), ( 100, 600 ), ( 200, 600 ) ] ] -- hadcoded some starting strokes to test the smoothing
       , viewportHeight = 30
       , viewportWidth = 30
       }
@@ -112,7 +108,6 @@ update msg model =
                     | pointerDown = True
                     , inputType = event.pointerType
                     , currentStroke = List.append model.currentStroke [ ( event.offsetX, event.offsetY ) ]
-                    , currentStrokeCoalesced = List.append model.currentStrokeCoalesced [ ( event.offsetX, event.offsetY ) ]
                   }
                 , Cmd.none
                 )
@@ -132,10 +127,6 @@ update msg model =
                                         :: restOfEvents
                                         |> List.map (\e -> ( e.offsetX, e.offsetY ))
                                         |> List.append model.currentStroke
-                                , currentStrokeCoalesced =
-                                    event
-                                        |> (\e -> ( e.offsetX, e.offsetY ))
-                                        |> (\p -> p :: model.currentStrokeCoalesced)
                                 , predictedStroke =
                                     evb.predictions
                                         |> List.map (\e -> ( e.offsetX, e.offsetY ))
@@ -158,7 +149,6 @@ update msg model =
                             ++ [ model.currentStroke
                                     ++ [ ( event.offsetX, event.offsetY ) ]
                                ]
-                    , currentStrokeCoalesced = []
                     , currentStroke = []
                     , predictedStroke = []
                     , pointerDown = False
@@ -215,7 +205,7 @@ svgPoint ( x, y ) =
         [ Sa.cx <| String.fromFloat x
         , Sa.cy <| String.fromFloat y
         , Sa.r "2"
-        , Sa.fill "grey"
+        , Sa.fill "red"
         ]
         []
 
@@ -272,6 +262,7 @@ svgCanvas model =
         ]
         (List.concat
             [ List.map stroke model.strokes
-            , [ stroke (model.currentStroke ++ model.predictedStroke) ]
+            , [ stroke model.currentStroke ] -- ++ model.predictedStroke) ]
+            , List.map svgPoint model.predictedStroke
             ]
         )
