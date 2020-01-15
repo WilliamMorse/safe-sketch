@@ -1,28 +1,24 @@
-port module Main exposing (Model, Msg(..), init, main, penMoveEvents, penPredictedEvents, pointToString, stroke, subscriptions, svgCanvas, svgPoint, svgPolylineStringFromPoints, unpackEvents, update, view)
+port module Main exposing (Model, Msg(..), init, main, pointToString, stroke, subscriptions, svgCanvas, svgPoint, svgPolylineStringFromPoints, unpackEvents, update, view)
 
 import Browser
 import Browser.Dom
 import Browser.Events as Be
-import Element exposing (..)
+import Element exposing (centerX, centerY, column, el, fill, height, html, htmlAttribute, width)
 import Element.Border as Border
 import Html exposing (Html)
 import Html.Attributes
-import Html.Events
 import Html.Lazy
-import Json.Decode as Decode exposing (Value)
+import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Encode as Encode
 import Pointer exposing (DeviceType, Event, blockContextMenu, eventDecoder, onDown, onUp)
 import Svg as S exposing (Svg)
 import Svg.Attributes as Sa
 import Svg.Lazy as So
 import Task
-import Vector as Vector exposing (Point)
+import Vector exposing (Point)
 
 
-port penMoveEvents : (Encode.Value -> msg) -> Sub msg
-
-
-port penPredictedEvents : (Encode.Value -> msg) -> Sub msg
+port penMoveEvent : (Encode.Value -> msg) -> Sub msg
 
 
 main : Program () Model Msg
@@ -68,7 +64,6 @@ type Msg
     = NoOp
     | Down Pointer.Event
     | Move Value
-    | Prediction Value
     | Up Pointer.Event
     | UpdateViewport Browser.Dom.Viewport
     | WindowResize Int Int
@@ -78,8 +73,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Be.onResize WindowResize
-        , penMoveEvents Move
-        , penPredictedEvents Prediction
+        , penMoveEvent Move
         ]
 
 
@@ -91,6 +85,19 @@ unpackEvents ev =
 
         Err _ ->
             []
+
+
+type alias EventBundle =
+    { events : List Event
+    , predictions : List Event
+    }
+
+
+decodeBundle : Decoder EventBundle
+decodeBundle =
+    Decode.map2 EventBundle
+        (Decode.field "events" (Decode.list eventDecoder))
+        (Decode.field "predictions" (Decode.list eventDecoder))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -113,40 +120,33 @@ update msg model =
             else
                 ( model, Cmd.none )
 
-        Move portEvent ->
-            case unpackEvents portEvent of
-                event :: restOfEvents ->
-                    ( { model
-                        | inputType = event.pointerType
-                        , currentStroke =
-                            event
-                                :: restOfEvents
-                                |> List.map (\e -> ( e.offsetX, e.offsetY ))
-                                |> List.append model.currentStroke
-                        , currentStrokeCoalesced =
-                            event
-                                |> (\e -> ( e.offsetX, e.offsetY ))
-                                |> (\p -> p :: model.currentStrokeCoalesced)
-                      }
-                    , Cmd.none
-                    )
+        Move bundeledEvent ->
+            case Decode.decodeValue decodeBundle bundeledEvent of
+                Ok evb ->
+                    case evb.events of
+                        event :: restOfEvents ->
+                            ( { model
+                                | inputType = event.pointerType
+                                , currentStroke =
+                                    event
+                                        :: restOfEvents
+                                        |> List.map (\e -> ( e.offsetX, e.offsetY ))
+                                        |> List.append model.currentStroke
+                                , currentStrokeCoalesced =
+                                    event
+                                        |> (\e -> ( e.offsetX, e.offsetY ))
+                                        |> (\p -> p :: model.currentStrokeCoalesced)
+                                , predictedStroke =
+                                    evb.predictions
+                                        |> List.map (\e -> ( e.offsetX, e.offsetY ))
+                              }
+                            , Cmd.none
+                            )
 
-                [] ->
-                    ( model, Cmd.none )
+                        [] ->
+                            ( model, Cmd.none )
 
-        Prediction portEvent ->
-            case unpackEvents portEvent of
-                event :: restOfEvents ->
-                    ( { model
-                        | predictedStroke =
-                            event
-                                :: restOfEvents
-                                |> List.map (\e -> ( e.offsetX, e.offsetY ))
-                      }
-                    , Cmd.none
-                    )
-
-                [] ->
+                Err _ ->
                     ( model, Cmd.none )
 
         Up event ->

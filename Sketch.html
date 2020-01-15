@@ -14,22 +14,12 @@
       });
 
       function moveEventHandeler(event) {
-        if (event.pointerType == "pen") { // Feature detection for getCoalescedEvents in PointerEvents V3
+        if (event.pointerType == "pen") {
 
-          if (event.getCoalescedEvents ) {
-            //console.log("coal", event.getCoalescedEvents().length)
-            app.ports.penMoveEvents.send(event.getCoalescedEvents())
-
-            if (event.getPredictedEvents) {
-              //console.log("pre", event.getPredictedEvents().length)
-              app.ports.penPredictedEvents.send(event.getPredictedEvents())
-            }
-            
-          }
-          else {
-            // fallback for non coalesced event support
-            app.ports.penMoveEvents.send([event]);
-            }
+          app.ports.penMoveEvent.send
+                ( { events : event.getCoalescedEvents()
+                  , predictions : event.getPredictedEvents()}
+                )
           
         }
       }
