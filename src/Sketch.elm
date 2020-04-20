@@ -262,7 +262,6 @@ svgCanvas model =
         ]
         (List.concat
             [ List.map stroke model.strokes
-            , [ stroke model.currentStroke ] -- ++ model.predictedStroke) ]
-            , List.map svgPoint model.predictedStroke
+            , [ stroke <| model.currentStroke ++ model.predictedStroke ]
             ]
         )

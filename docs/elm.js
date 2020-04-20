@@ -5191,7 +5191,7 @@ var $author$project$Main$UpdateViewport = function (a) {
 };
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $author$project$Main$init = _Utils_Tuple2(
-	{currentStroke: _List_Nil, currentStrokeCoalesced: _List_Nil, inputType: $author$project$Pointer$Pen, pointerDown: false, predictedStroke: _List_Nil, strokes: _List_Nil, viewportHeight: 30, viewportWidth: 30},
+	{currentStroke: _List_Nil, inputType: $author$project$Pointer$Pen, pointerDown: false, predictedStroke: _List_Nil, strokes: _List_Nil, viewportHeight: 30, viewportWidth: 30},
 	A2($elm$core$Task$perform, $author$project$Main$UpdateViewport, $elm$browser$Browser$Dom$getViewport));
 var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
 var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
@@ -5657,7 +5657,9 @@ var $author$project$Pointer$Event = function (pointerId) {
 													return function (screenY) {
 														return function (pageX) {
 															return function (pageY) {
-																return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, twist: twist, width: width};
+																return function (timestamp) {
+																	return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, timestamp: timestamp, twist: twist, width: width};
+																};
 															};
 														};
 													};
@@ -5692,56 +5694,59 @@ var $author$project$Pointer$inputTypeFromString = function (str) {
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Pointer$eventDecoder = A2(
 	$author$project$Pointer$andMap,
-	A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'timeStamp', $elm$json$Json$Decode$float),
 	A2(
 		$author$project$Pointer$andMap,
-		A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
+		A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float),
 		A2(
 			$author$project$Pointer$andMap,
-			A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float),
+			A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float),
 			A2(
 				$author$project$Pointer$andMap,
-				A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
+				A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float),
 				A2(
 					$author$project$Pointer$andMap,
-					A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float),
+					A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
 					A2(
 						$author$project$Pointer$andMap,
-						A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
+						A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float),
 						A2(
 							$author$project$Pointer$andMap,
-							A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
+							A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
 							A2(
 								$author$project$Pointer$andMap,
-								A2(
-									$elm$json$Json$Decode$field,
-									'pointerType',
-									A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string)),
+								A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
 								A2(
 									$author$project$Pointer$andMap,
-									A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float),
+									A2(
+										$elm$json$Json$Decode$field,
+										'pointerType',
+										A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string)),
 									A2(
 										$author$project$Pointer$andMap,
-										A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float),
+										A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float),
 										A2(
 											$author$project$Pointer$andMap,
-											A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
+											A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float),
 											A2(
 												$author$project$Pointer$andMap,
-												A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float),
+												A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
 												A2(
 													$author$project$Pointer$andMap,
-													A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
+													A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float),
 													A2(
 														$author$project$Pointer$andMap,
-														A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
+														A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
 														A2(
 															$author$project$Pointer$andMap,
-															A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+															A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
 															A2(
 																$author$project$Pointer$andMap,
-																A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float),
-																$elm$json$Json$Decode$succeed($author$project$Pointer$Event)))))))))))))))));
+																A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+																A2(
+																	$author$project$Pointer$andMap,
+																	A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float),
+																	$elm$json$Json$Decode$succeed($author$project$Pointer$Event))))))))))))))))));
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Main$decodeBundle = A3(
 	$elm$json$Json$Decode$map2,
@@ -5775,13 +5780,6 @@ var $author$project$Main$update = F2(
 									[
 										_Utils_Tuple2(event.offsetX, event.offsetY)
 									])),
-							currentStrokeCoalesced: A2(
-								$elm$core$List$append,
-								model.currentStrokeCoalesced,
-								_List_fromArray(
-									[
-										_Utils_Tuple2(event.offsetX, event.offsetY)
-									])),
 							inputType: event.pointerType,
 							pointerDown: true
 						}),
@@ -5808,12 +5806,6 @@ var $author$project$Main$update = F2(
 												return _Utils_Tuple2(e.offsetX, e.offsetY);
 											},
 											A2($elm$core$List$cons, event, restOfEvents))),
-									currentStrokeCoalesced: function (p) {
-										return A2($elm$core$List$cons, p, model.currentStrokeCoalesced);
-									}(
-										function (e) {
-											return _Utils_Tuple2(e.offsetX, e.offsetY);
-										}(event)),
 									inputType: event.pointerType,
 									predictedStroke: A2(
 										$elm$core$List$map,
@@ -5836,7 +5828,6 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							currentStroke: _List_Nil,
-							currentStrokeCoalesced: _List_Nil,
 							inputType: event.pointerType,
 							pointerDown: false,
 							predictedStroke: _List_Nil,
@@ -11719,26 +11710,6 @@ var $author$project$Main$stroke = function (points) {
 		_List_Nil);
 };
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $author$project$Main$svgPoint = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return A2(
-		$elm$svg$Svg$circle,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$cx(
-				$elm$core$String$fromFloat(x)),
-				$elm$svg$Svg$Attributes$cy(
-				$elm$core$String$fromFloat(y)),
-				$elm$svg$Svg$Attributes$r('2'),
-				$elm$svg$Svg$Attributes$fill('red')
-			]),
-		_List_Nil);
-};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $author$project$Main$svgCanvas = function (model) {
@@ -11759,9 +11730,9 @@ var $author$project$Main$svgCanvas = function (model) {
 					A2($elm$core$List$map, $author$project$Main$stroke, model.strokes),
 					_List_fromArray(
 					[
-						$author$project$Main$stroke(model.currentStroke)
-					]),
-					A2($elm$core$List$map, $author$project$Main$svgPoint, model.predictedStroke)
+						$author$project$Main$stroke(
+						_Utils_ap(model.currentStroke, model.predictedStroke))
+					])
 				])));
 };
 var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(

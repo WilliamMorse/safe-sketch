@@ -17,9 +17,11 @@
         if (event.pointerType == "pen") {
 
           app.ports.penMoveEvent.send
-                ( { events : event.getCoalescedEvents()
-                  , predictions : event.getPredictedEvents()}
-                )
+          (
+            { events : event.getCoalescedEvents()
+            , predictions : event.getPredictedEvents()
+            }
+          )
           
         }
       }
@@ -29,8 +31,6 @@
           var canvas = document.getElementById("sketchspace")
           canvas.addEventListener("pointermove",  moveEventHandeler );
       });
-  
-
   
   </script>
   </body>

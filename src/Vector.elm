@@ -63,7 +63,7 @@ distanceBetween a b =
 -}
 rel : Point -> Point -> Point
 rel a b =
-    subtract b a
+    subtract a b
 
 
 norm : Point -> Point

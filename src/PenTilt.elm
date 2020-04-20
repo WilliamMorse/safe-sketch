@@ -46,10 +46,10 @@ toCartesian tilt =
         z =
             cos tilt.x * cos tilt.y
 
-        norm =
+        length =
             sqrt (x ^ 2 + y ^ 2 + z ^ 2)
     in
-    Cartesian (x / norm) (y / norm) (z / norm)
+    Cartesian (x / length) (y / length) (z / length)
 
 
 cartiesian_to_spherical : Cartesian -> Spherical
@@ -72,3 +72,15 @@ toSpherical tilt =
     tilt
         |> toCartesian
         |> cartiesian_to_spherical
+
+
+fromCartiesian : Cartesian -> Tilt
+fromCartiesian cart =
+    let
+        tiltx =
+            atan2 cart.y cart.z
+        tilty = atan2 cart.x cart.z
+
+        r = 
+    in
+    Tilt 1 0 0

@@ -28,6 +28,7 @@ type alias Event =
     , screenY : Float
     , pageX : Float
     , pageY : Float
+    , timestamp : Float
     }
 
 
@@ -74,6 +75,7 @@ eventDecoder =
         |> andMap (field "screenY" Decode.float)
         |> andMap (field "pageX" Decode.float)
         |> andMap (field "pageY" Decode.float)
+        |> andMap (field "timeStamp" Decode.float)
 --}
 
 
