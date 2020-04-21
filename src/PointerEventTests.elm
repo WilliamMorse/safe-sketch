@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
+module PointerEventTests exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
 
 import Browser
 import Element exposing (Column, column, fill, height, htmlAttribute, padding, spacing, table, text, width)
@@ -9,7 +9,7 @@ import Html.Attributes
 import Html.Events
 import Json.Decode as D
 import PenTilt as Tilt
-import Pointer exposing (DeviceType(..), Event, onDown, onMove)
+import Pointer exposing (DeviceType(..), Event, defaultEvent, onDown, onMove)
 
 
 main : Program () Model Msg
@@ -24,27 +24,6 @@ main =
 
 type alias Point =
     ( Float, Float )
-
-
-defaultEvent : Event
-defaultEvent =
-    { pointerId = -1
-    , width = 0
-    , height = 0
-    , pressure = 0
-    , tangentialpressure = 0
-    , tiltX = 0
-    , tiltY = 0
-    , twist = 0
-    , pointerType = Mouse
-    , isPrimary = False
-    , offsetX = 0
-    , offsetY = 0
-    , screenX = 0
-    , screenY = 0
-    , pageX = 0
-    , pageY = 0
-    }
 
 
 type alias Model =
@@ -162,7 +141,7 @@ view model =
                     , Column
                         (text "Tangential Pressure")
                         fill
-                        (\p -> text <| p.tanpress)
+                        (\p -> text <| p.tanPress)
                     ]
                 }
             , table
@@ -214,6 +193,17 @@ position m =
     ]
 
 
+orentation :
+    Event
+    ->
+        List
+            { label : String
+            , phi : String
+            , theta : String
+            , tiltX : Float
+            , tiltY : Float
+            , twist : Float
+            }
 orentation m =
     let
         sph =
@@ -229,25 +219,22 @@ orentation m =
     ]
 
 
+pressure : Event -> List { label : String, press : String, tanPress : String }
 pressure m =
     [ { label = "Normalized Force"
       , press = truncateTo 5 m.pressure
-      , tanpress = truncateTo 5 m.tangentialpressure
+      , tanPress = truncateTo 5 m.tangentialPressure
       }
     ]
 
 
+touch : Event -> List { label : String, height : String, width : String }
 touch m =
     [ { label = "Touch"
       , height = truncateTo 5 m.height
       , width = truncateTo 5 m.width
       }
     ]
-
-
-shiftDecimalBy : Int -> Float -> Float
-shiftDecimalBy places number =
-    number * toFloat (10 ^ places)
 
 
 truncateTo : Int -> Float -> String
@@ -262,7 +249,3 @@ truncateTo places number =
     number
         |> String.fromFloat
         |> String.left (places + t)
-
-
-
---toFloat (truncate (number * toFloat placesAfterDecimal)) / toFloat placesAfterDecimal

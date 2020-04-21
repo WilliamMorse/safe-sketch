@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>safe sketch</title>
-  <script src="sketch.js"></script>
+  <title>Pressure Plot</title>
+  <script src="pressure-plot.js"></script>
 </head>
 
 <body>
   <div id="elm"></div>
   <script>
-    var app = Elm.Sketch.init({
+    var app = Elm.PressurePlot.init({
       node: document.getElementById("elm")
     });
 
@@ -18,11 +18,10 @@
       if (event.pointerType == "pen") {
 
         app.ports.penMoveEvent.send
-          (
-            {
-              events: event.getCoalescedEvents()
-              , predictions: event.getPredictedEvents()
-            }
+          ({
+            events: event.getCoalescedEvents()
+            , predictions: event.getPredictedEvents()
+          }
           )
 
       }
@@ -30,9 +29,11 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       console.log("DOMLoaded")
-      var canvas = document.getElementById("sketchspace")
+      var canvas = document.getElementById("pen")
       canvas.addEventListener("pointermove", moveEventHandeler);
     });
+
+
 
   </script>
 </body>

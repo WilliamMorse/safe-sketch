@@ -1,4 +1,4 @@
-port module Main exposing (Model, Msg(..), Point, blockContextMenu, decodeBundle, defaultEvent, init, main, penMoveEvent, pressureChart, subscriptions, update, velocity, view, xyChart)
+port module PressurePlot exposing (Model, Msg(..), Point, blockContextMenu, decodeBundle, defaultEvent, init, main, penMoveEvent, pressureChart, subscriptions, update, velocity, view, xyChart)
 
 import Browser
 import Element exposing (Column, Element, column, fill, height, html, htmlAttribute, padding, row, spacing, table, text, width)
@@ -11,8 +11,8 @@ import Json.Decode as Decode exposing (Value)
 import Json.Encode as Encode
 import LineChart
 import PenTilt as Tilt
-import Pointer exposing (DeviceType(..), Event, eventDecoder, onDown, onMove)
-import Vector as V
+import Pointer exposing (DeviceType(..), Event, defaultEvent, eventDecoder, onDown, onMove)
+import Vector2d as V
 
 
 port penMoveEvent : (Encode.Value -> msg) -> Sub msg
@@ -31,28 +31,6 @@ main =
 type alias Point =
     { x : Float
     , y : Float
-    }
-
-
-defaultEvent : Event
-defaultEvent =
-    { pointerId = -1
-    , width = 0
-    , height = 0
-    , pressure = 0
-    , tangentialpressure = 0
-    , tiltX = 0
-    , tiltY = 0
-    , twist = 0
-    , pointerType = Mouse
-    , isPrimary = False
-    , offsetX = 0
-    , offsetY = 0
-    , screenX = 0
-    , screenY = 0
-    , pageX = 0
-    , pageY = 0
-    , timestamp = 0
     }
 
 
@@ -149,7 +127,10 @@ pressureChart model =
         LineChart.view1
             .x
             .y
-            (List.indexedMap (\x y -> Point (toFloat x) y.pressure) model.events)
+            (List.indexedMap
+                (\x y -> Point (toFloat x) y.pressure)
+                model.events
+            )
 
 
 velocityChart : Model -> Element msg
@@ -158,7 +139,10 @@ velocityChart model =
         LineChart.view1
             .x
             .y
-            (List.indexedMap (\x y -> Point (toFloat x) y) (velocity model))
+            (List.indexedMap
+                (\x y -> Point (toFloat x) y)
+                (velocity model)
+            )
 
 
 xyChart : Model -> Element msg
@@ -196,4 +180,4 @@ velocity model =
         vel =
             List.map2 (/) posDiff tDiff
     in
-    posDiff
+    vel

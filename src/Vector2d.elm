@@ -1,4 +1,4 @@
-module Vector exposing (Point, add, distanceBetween, dotProduct, length, length2, multiply, norm, norm2, proj, projL, rel, subtract)
+module Vector2d exposing (Point, add, distanceBetween, dotProduct, length, length2, multiply, norm, norm2, proj, projL, rel, subtract)
 
 {-| A 2d vector module for calculating spline control points
 -}

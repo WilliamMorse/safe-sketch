@@ -1,4 +1,4 @@
-module PenTilt exposing (Cartesian, Spherical, Tilt, toCartesian, toSpherical)
+module PenTilt exposing (Cartesian, Spherical, Tilt, fromCartiesian, toCartesian, toSpherical)
 
 
 type alias Tilt =
@@ -77,10 +77,16 @@ toSpherical tilt =
 fromCartiesian : Cartesian -> Tilt
 fromCartiesian cart =
     let
-        tiltx =
+        x =
             atan2 cart.y cart.z
-        tilty = atan2 cart.x cart.z
 
-        r = 
+        y =
+            atan2 cart.x cart.z
+
+        r =
+            [ cart.x, cart.y, cart.z ]
+                |> List.map (\a -> a ^ 2)
+                |> List.sum
+                |> sqrt
     in
-    Tilt 1 0 0
+    Tilt r x y

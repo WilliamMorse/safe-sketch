@@ -1,4 +1,4 @@
-port module Main exposing (Model, Msg(..), init, main, pointToString, stroke, subscriptions, svgCanvas, svgPoint, svgPolylineStringFromPoints, unpackEvents, update, view)
+port module Sketch exposing (Model, Msg(..), init, main, pointToString, stroke, subscriptions, svgCanvas, svgPoint, svgPolylineStringFromPoints, unpackEvents, update, view)
 
 import Browser
 import Browser.Dom
@@ -15,7 +15,7 @@ import Svg as S exposing (Svg)
 import Svg.Attributes as Sa
 import Svg.Lazy as So
 import Task
-import Vector exposing (Point)
+import Vector2d exposing (Point)
 
 
 port penMoveEvent : (Encode.Value -> msg) -> Sub msg
@@ -48,7 +48,7 @@ init =
       , pointerDown = False
       , currentStroke = []
       , predictedStroke = []
-      , strokes = [] --[ [ ( 100, 100 ), ( 500, 500 ), ( 100, 600 ), ( 200, 600 ) ] ] -- hadcoded some starting strokes to test the smoothing
+      , strokes = []
       , viewportHeight = 30
       , viewportWidth = 30
       }
