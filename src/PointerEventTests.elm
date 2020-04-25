@@ -221,7 +221,7 @@ orentation m =
 
 pressure : Event -> List { label : String, press : String, tanPress : String }
 pressure m =
-    [ { label = "Normalized Force"
+    [ { label = "Pen Force Sensors"
       , press = truncateTo 5 m.pressure
       , tanPress = truncateTo 5 m.tangentialPressure
       }

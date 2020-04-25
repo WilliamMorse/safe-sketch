@@ -1,4 +1,4 @@
-port module PressurePlot exposing (Model, Msg(..), Point, blockContextMenu, decodeBundle, defaultEvent, init, main, penMoveEvent, pressureChart, subscriptions, update, velocity, view, xyChart)
+port module PressurePlot exposing (Model, Msg(..), Point, blockContextMenu, decodeBundle, init, main, penMoveEvent, pressureChart, subscriptions, update, velocity, view, xyChart)
 
 import Browser
 import Element exposing (Column, Element, column, fill, height, html, htmlAttribute, padding, row, spacing, table, text, width)
@@ -79,7 +79,9 @@ update msg model =
         Move ev ->
             case Decode.decodeValue decodeBundle ev of
                 Ok bundle ->
-                    ( Model (model.events ++ bundle.events) bundle.predictions, Cmd.none )
+                    ( Model (model.events ++ bundle.events) bundle.predictions
+                    , Cmd.none
+                    )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -159,7 +161,7 @@ velocity : Model -> List Float
 velocity model =
     let
         t1 =
-            List.map (\e -> e.timestamp) model.events
+            List.map (\e -> e.timeStamp) model.events
 
         t2 =
             List.drop 1 t1

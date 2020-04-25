@@ -5203,10 +5203,10 @@ var $author$project$Pointer$Mouse = {$: 'Mouse'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$PointerEventTests$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialpressure: 0, tiltX: 0, tiltY: 0, timestamp: 0, twist: 0, width: 0};
+var $author$project$Pointer$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialPressure: 0, tiltX: 0, tiltY: 0, timeStamp: 0, twist: 0, width: 0};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$PointerEventTests$init = _Utils_Tuple2($author$project$PointerEventTests$defaultEvent, $elm$core$Platform$Cmd$none);
+var $author$project$PointerEventTests$init = _Utils_Tuple2($author$project$Pointer$defaultEvent, $elm$core$Platform$Cmd$none);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$PointerEventTests$subscriptions = function (_v0) {
@@ -11113,7 +11113,231 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
-var $author$project$Pointer$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialpressure: 0, tiltX: 0, tiltY: 0, timestamp: 0, twist: 0, width: 0};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $author$project$Pointer$updateRecordWithDecoder = F3(
+	function (setter, decoder, valueToUpdate) {
+		return A2(
+			$elm$json$Json$Decode$map,
+			setter(valueToUpdate),
+			decoder);
+	});
+var $author$project$Pointer$andUpdate = F2(
+	function (setter, decoder) {
+		return $elm$json$Json$Decode$andThen(
+			A2($author$project$Pointer$updateRecordWithDecoder, setter, decoder));
+	});
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $author$project$Pointer$Pen = {$: 'Pen'};
+var $author$project$Pointer$Touch = {$: 'Touch'};
+var $author$project$Pointer$inputTypeFromString = function (str) {
+	switch (str) {
+		case 'touch':
+			return $author$project$Pointer$Touch;
+		case 'pen':
+			return $author$project$Pointer$Pen;
+		default:
+			return $author$project$Pointer$Mouse;
+	}
+};
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Pointer$eventDecoderWithDefault = A2(
+	$elm$core$Basics$composeR,
+	$elm$json$Json$Decode$succeed,
+	A2(
+		$elm$core$Basics$composeR,
+		A2(
+			$author$project$Pointer$andUpdate,
+			F2(
+				function (e, a) {
+					return _Utils_update(
+						e,
+						{pointerId: a});
+				}),
+			A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float)),
+		A2(
+			$elm$core$Basics$composeR,
+			A2(
+				$author$project$Pointer$andUpdate,
+				F2(
+					function (e, a) {
+						return _Utils_update(
+							e,
+							{width: a});
+					}),
+				A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float)),
+			A2(
+				$elm$core$Basics$composeR,
+				A2(
+					$author$project$Pointer$andUpdate,
+					F2(
+						function (e, a) {
+							return _Utils_update(
+								e,
+								{height: a});
+						}),
+					A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float)),
+				A2(
+					$elm$core$Basics$composeR,
+					A2(
+						$author$project$Pointer$andUpdate,
+						F2(
+							function (e, a) {
+								return _Utils_update(
+									e,
+									{pressure: a});
+							}),
+						A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float)),
+					A2(
+						$elm$core$Basics$composeR,
+						A2(
+							$author$project$Pointer$andUpdate,
+							F2(
+								function (e, a) {
+									return _Utils_update(
+										e,
+										{tangentialPressure: a});
+								}),
+							A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float)),
+						A2(
+							$elm$core$Basics$composeR,
+							A2(
+								$author$project$Pointer$andUpdate,
+								F2(
+									function (e, a) {
+										return _Utils_update(
+											e,
+											{tiltX: a});
+									}),
+								A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float)),
+							A2(
+								$elm$core$Basics$composeR,
+								A2(
+									$author$project$Pointer$andUpdate,
+									F2(
+										function (e, a) {
+											return _Utils_update(
+												e,
+												{tiltY: a});
+										}),
+									A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float)),
+								A2(
+									$elm$core$Basics$composeR,
+									A2(
+										$author$project$Pointer$andUpdate,
+										F2(
+											function (e, a) {
+												return _Utils_update(
+													e,
+													{twist: a});
+											}),
+										A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float)),
+									A2(
+										$elm$core$Basics$composeR,
+										A2(
+											$author$project$Pointer$andUpdate,
+											F2(
+												function (e, a) {
+													return _Utils_update(
+														e,
+														{pointerType: a});
+												}),
+											A2(
+												$elm$json$Json$Decode$field,
+												'pointerType',
+												A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string))),
+										A2(
+											$elm$core$Basics$composeR,
+											A2(
+												$author$project$Pointer$andUpdate,
+												F2(
+													function (e, a) {
+														return _Utils_update(
+															e,
+															{isPrimary: a});
+													}),
+												A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool)),
+											A2(
+												$elm$core$Basics$composeR,
+												A2(
+													$author$project$Pointer$andUpdate,
+													F2(
+														function (e, a) {
+															return _Utils_update(
+																e,
+																{offsetX: a});
+														}),
+													A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float)),
+												A2(
+													$elm$core$Basics$composeR,
+													A2(
+														$author$project$Pointer$andUpdate,
+														F2(
+															function (e, a) {
+																return _Utils_update(
+																	e,
+																	{offsetY: a});
+															}),
+														A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float)),
+													A2(
+														$elm$core$Basics$composeR,
+														A2(
+															$author$project$Pointer$andUpdate,
+															F2(
+																function (e, a) {
+																	return _Utils_update(
+																		e,
+																		{screenX: a});
+																}),
+															A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float)),
+														A2(
+															$elm$core$Basics$composeR,
+															A2(
+																$author$project$Pointer$andUpdate,
+																F2(
+																	function (e, a) {
+																		return _Utils_update(
+																			e,
+																			{screenY: a});
+																	}),
+																A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float)),
+															A2(
+																$elm$core$Basics$composeR,
+																A2(
+																	$author$project$Pointer$andUpdate,
+																	F2(
+																		function (e, a) {
+																			return _Utils_update(
+																				e,
+																				{pageX: a});
+																		}),
+																	A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float)),
+																A2(
+																	$elm$core$Basics$composeR,
+																	A2(
+																		$author$project$Pointer$andUpdate,
+																		F2(
+																			function (e, a) {
+																				return _Utils_update(
+																					e,
+																					{pageY: a});
+																			}),
+																		A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float)),
+																	A2(
+																		$author$project$Pointer$andUpdate,
+																		F2(
+																			function (e, a) {
+																				return _Utils_update(
+																					e,
+																					{timeStamp: a});
+																			}),
+																		A2($elm$json$Json$Decode$field, 'timeStamp', $elm$json$Json$Decode$float)))))))))))))))))));
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -11124,44 +11348,6 @@ var $elm$html$Html$Events$on = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $author$project$Pointer$saferEventDecoder = function (ev) {
-	return A2(
-		$elm$json$Json$Decode$andThen,
-		function (event) {
-			return A2(
-				$elm$json$Json$Decode$map,
-				function (a) {
-					return _Utils_update(
-						event,
-						{isPrimary: a});
-				},
-				A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool));
-		},
-		A2(
-			$elm$json$Json$Decode$andThen,
-			function (event) {
-				return A2(
-					$elm$json$Json$Decode$map,
-					function (a) {
-						return _Utils_update(
-							event,
-							{offsetY: a});
-					},
-					A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float));
-			},
-			A2(
-				$elm$json$Json$Decode$map,
-				function (a) {
-					return _Utils_update(
-						ev,
-						{offsetX: a});
-				},
-				A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float))));
-};
 var $author$project$Pointer$on = F2(
 	function (event, tag) {
 		return A2(
@@ -11170,7 +11356,7 @@ var $author$project$Pointer$on = F2(
 			A2(
 				$elm$json$Json$Decode$map,
 				tag,
-				$author$project$Pointer$saferEventDecoder($author$project$Pointer$defaultEvent)));
+				$author$project$Pointer$eventDecoderWithDefault($author$project$Pointer$defaultEvent)));
 	});
 var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
 var $author$project$Pointer$onMove = $author$project$Pointer$on('pointermove');
@@ -11285,9 +11471,9 @@ var $author$project$PointerEventTests$pressure = function (m) {
 	return _List_fromArray(
 		[
 			{
-			label: 'Normalized Force',
+			label: 'Pen Force Sensors',
 			press: A2($author$project$PointerEventTests$truncateTo, 5, m.pressure),
-			tanPress: A2($author$project$PointerEventTests$truncateTo, 5, m.tangentialpressure)
+			tanPress: A2($author$project$PointerEventTests$truncateTo, 5, m.tangentialPressure)
 		}
 		]);
 };

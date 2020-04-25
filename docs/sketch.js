@@ -5645,7 +5645,7 @@ var $author$project$Pointer$Event = function (pointerId) {
 	return function (width) {
 		return function (height) {
 			return function (pressure) {
-				return function (tangentialpressure) {
+				return function (tangentialPressure) {
 					return function (tiltX) {
 						return function (tiltY) {
 							return function (twist) {
@@ -5657,8 +5657,8 @@ var $author$project$Pointer$Event = function (pointerId) {
 													return function (screenY) {
 														return function (pageX) {
 															return function (pageY) {
-																return function (timestamp) {
-																	return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialpressure: tangentialpressure, tiltX: tiltX, tiltY: tiltY, timestamp: timestamp, twist: twist, width: width};
+																return function (timeStamp) {
+																	return {height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialPressure: tangentialPressure, tiltX: tiltX, tiltY: tiltY, timeStamp: timeStamp, twist: twist, width: width};
 																};
 															};
 														};
@@ -11650,7 +11650,216 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
 var $elm$svg$Svg$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
-var $author$project$Pointer$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialpressure: 0, tiltX: 0, tiltY: 0, timestamp: 0, twist: 0, width: 0};
+var $author$project$Pointer$defaultEvent = {height: 0, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialPressure: 0, tiltX: 0, tiltY: 0, timeStamp: 0, twist: 0, width: 0};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $author$project$Pointer$updateRecordWithDecoder = F3(
+	function (setter, decoder, valueToUpdate) {
+		return A2(
+			$elm$json$Json$Decode$map,
+			setter(valueToUpdate),
+			decoder);
+	});
+var $author$project$Pointer$andUpdate = F2(
+	function (setter, decoder) {
+		return $elm$json$Json$Decode$andThen(
+			A2($author$project$Pointer$updateRecordWithDecoder, setter, decoder));
+	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $author$project$Pointer$eventDecoderWithDefault = A2(
+	$elm$core$Basics$composeR,
+	$elm$json$Json$Decode$succeed,
+	A2(
+		$elm$core$Basics$composeR,
+		A2(
+			$author$project$Pointer$andUpdate,
+			F2(
+				function (e, a) {
+					return _Utils_update(
+						e,
+						{pointerId: a});
+				}),
+			A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$float)),
+		A2(
+			$elm$core$Basics$composeR,
+			A2(
+				$author$project$Pointer$andUpdate,
+				F2(
+					function (e, a) {
+						return _Utils_update(
+							e,
+							{width: a});
+					}),
+				A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float)),
+			A2(
+				$elm$core$Basics$composeR,
+				A2(
+					$author$project$Pointer$andUpdate,
+					F2(
+						function (e, a) {
+							return _Utils_update(
+								e,
+								{height: a});
+						}),
+					A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float)),
+				A2(
+					$elm$core$Basics$composeR,
+					A2(
+						$author$project$Pointer$andUpdate,
+						F2(
+							function (e, a) {
+								return _Utils_update(
+									e,
+									{pressure: a});
+							}),
+						A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float)),
+					A2(
+						$elm$core$Basics$composeR,
+						A2(
+							$author$project$Pointer$andUpdate,
+							F2(
+								function (e, a) {
+									return _Utils_update(
+										e,
+										{tangentialPressure: a});
+								}),
+							A2($elm$json$Json$Decode$field, 'tangentialPressure', $elm$json$Json$Decode$float)),
+						A2(
+							$elm$core$Basics$composeR,
+							A2(
+								$author$project$Pointer$andUpdate,
+								F2(
+									function (e, a) {
+										return _Utils_update(
+											e,
+											{tiltX: a});
+									}),
+								A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float)),
+							A2(
+								$elm$core$Basics$composeR,
+								A2(
+									$author$project$Pointer$andUpdate,
+									F2(
+										function (e, a) {
+											return _Utils_update(
+												e,
+												{tiltY: a});
+										}),
+									A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float)),
+								A2(
+									$elm$core$Basics$composeR,
+									A2(
+										$author$project$Pointer$andUpdate,
+										F2(
+											function (e, a) {
+												return _Utils_update(
+													e,
+													{twist: a});
+											}),
+										A2($elm$json$Json$Decode$field, 'twist', $elm$json$Json$Decode$float)),
+									A2(
+										$elm$core$Basics$composeR,
+										A2(
+											$author$project$Pointer$andUpdate,
+											F2(
+												function (e, a) {
+													return _Utils_update(
+														e,
+														{pointerType: a});
+												}),
+											A2(
+												$elm$json$Json$Decode$field,
+												'pointerType',
+												A2($elm$json$Json$Decode$map, $author$project$Pointer$inputTypeFromString, $elm$json$Json$Decode$string))),
+										A2(
+											$elm$core$Basics$composeR,
+											A2(
+												$author$project$Pointer$andUpdate,
+												F2(
+													function (e, a) {
+														return _Utils_update(
+															e,
+															{isPrimary: a});
+													}),
+												A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool)),
+											A2(
+												$elm$core$Basics$composeR,
+												A2(
+													$author$project$Pointer$andUpdate,
+													F2(
+														function (e, a) {
+															return _Utils_update(
+																e,
+																{offsetX: a});
+														}),
+													A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float)),
+												A2(
+													$elm$core$Basics$composeR,
+													A2(
+														$author$project$Pointer$andUpdate,
+														F2(
+															function (e, a) {
+																return _Utils_update(
+																	e,
+																	{offsetY: a});
+															}),
+														A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float)),
+													A2(
+														$elm$core$Basics$composeR,
+														A2(
+															$author$project$Pointer$andUpdate,
+															F2(
+																function (e, a) {
+																	return _Utils_update(
+																		e,
+																		{screenX: a});
+																}),
+															A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float)),
+														A2(
+															$elm$core$Basics$composeR,
+															A2(
+																$author$project$Pointer$andUpdate,
+																F2(
+																	function (e, a) {
+																		return _Utils_update(
+																			e,
+																			{screenY: a});
+																	}),
+																A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float)),
+															A2(
+																$elm$core$Basics$composeR,
+																A2(
+																	$author$project$Pointer$andUpdate,
+																	F2(
+																		function (e, a) {
+																			return _Utils_update(
+																				e,
+																				{pageX: a});
+																		}),
+																	A2($elm$json$Json$Decode$field, 'pageX', $elm$json$Json$Decode$float)),
+																A2(
+																	$elm$core$Basics$composeR,
+																	A2(
+																		$author$project$Pointer$andUpdate,
+																		F2(
+																			function (e, a) {
+																				return _Utils_update(
+																					e,
+																					{pageY: a});
+																			}),
+																		A2($elm$json$Json$Decode$field, 'pageY', $elm$json$Json$Decode$float)),
+																	A2(
+																		$author$project$Pointer$andUpdate,
+																		F2(
+																			function (e, a) {
+																				return _Utils_update(
+																					e,
+																					{timeStamp: a});
+																			}),
+																		A2($elm$json$Json$Decode$field, 'timeStamp', $elm$json$Json$Decode$float)))))))))))))))))));
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -11661,41 +11870,6 @@ var $elm$html$Html$Events$on = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $author$project$Pointer$saferEventDecoder = function (ev) {
-	return A2(
-		$elm$json$Json$Decode$andThen,
-		function (event) {
-			return A2(
-				$elm$json$Json$Decode$map,
-				function (a) {
-					return _Utils_update(
-						event,
-						{isPrimary: a});
-				},
-				A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool));
-		},
-		A2(
-			$elm$json$Json$Decode$andThen,
-			function (event) {
-				return A2(
-					$elm$json$Json$Decode$map,
-					function (a) {
-						return _Utils_update(
-							event,
-							{offsetY: a});
-					},
-					A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float));
-			},
-			A2(
-				$elm$json$Json$Decode$map,
-				function (a) {
-					return _Utils_update(
-						ev,
-						{offsetX: a});
-				},
-				A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float))));
-};
 var $author$project$Pointer$on = F2(
 	function (event, tag) {
 		return A2(
@@ -11704,7 +11878,7 @@ var $author$project$Pointer$on = F2(
 			A2(
 				$elm$json$Json$Decode$map,
 				tag,
-				$author$project$Pointer$saferEventDecoder($author$project$Pointer$defaultEvent)));
+				$author$project$Pointer$eventDecoderWithDefault($author$project$Pointer$defaultEvent)));
 	});
 var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
 var $author$project$Pointer$onUp = $author$project$Pointer$on('pointerup');

@@ -101,8 +101,7 @@ defaultEvent =
     }
 
 
-
-{--
+{--}
 updateRecordWithDecoder : (value -> a -> value) -> Decoder a -> value -> Decoder value
 updateRecordWithDecoder setter decoder valueToUpdate =
     Decode.map (setter valueToUpdate) decoder
@@ -113,33 +112,68 @@ andUpdate setter decoder =
     Decode.andThen <| updateRecordWithDecoder setter decoder
 
 
-anyOrderEventDecoderWithDefault : Event -> Decoder Event
-anyOrderEventDecoderWithDefault =
+eventDecoderWithDefault : Event -> Decoder Event
+eventDecoderWithDefault =
     Decode.succeed
-        >> andUpdate (\e a -> { e | pointerId = a }) (field "pointerId" Decode.float)
-        >> andUpdate (\e a -> { e | width = a }) (field "width" Decode.float)
-        >> andUpdate (\e a -> { e | height = a }) (field "height" Decode.float)
-        >> andUpdate (\e a -> { e | pressure = a }) (field "pressure" Decode.float)
-        >> andUpdate (\e a -> { e | tangentialPressure = a }) (field "tangentialPressure" Decode.float)
-        >> andUpdate (\e a -> { e | tiltX = a }) (field "tiltX" Decode.float)
-        >> andUpdate (\e a -> { e | tiltY = a }) (field "tiltY" Decode.float)
-        >> andUpdate (\e a -> { e | twist = a }) (field "twist" Decode.float)
-        >> andUpdate (\e a -> { e | pointerType = a })
-            (field "pointerType" (Decode.map inputTypeFromString Decode.string))
-        >> andUpdate (\e a -> { e | isPrimary = a }) (field "isPrimary" Decode.bool)
-        >> andUpdate (\e a -> { e | offsetX = a }) (field "offsetX" Decode.float)
-        >> andUpdate (\e a -> { e | offsetY = a }) (field "offsetY" Decode.float)
-        >> andUpdate (\e a -> { e | screenX = a }) (field "screenX" Decode.float)
-        >> andUpdate (\e a -> { e | screenY = a }) (field "screenY" Decode.float)
-        >> andUpdate (\e a -> { e | pageX = a }) (field "pageX" Decode.float)
-        >> andUpdate (\e a -> { e | pageY = a }) (field "pageY" Decode.float)
-        >> andUpdate (\e a -> { e | timeStamp = a }) (field "timeStamp" Decode.float)
+        >> andUpdate
+            (\e a -> { e | pointerId = a })
+            (field "pointerId" Decode.float)
+        >> andUpdate
+            (\e a -> { e | width = a })
+            (field "width" Decode.float)
+        >> andUpdate
+            (\e a -> { e | height = a })
+            (field "height" Decode.float)
+        >> andUpdate
+            (\e a -> { e | pressure = a })
+            (field "pressure" Decode.float)
+        >> andUpdate
+            (\e a -> { e | tangentialPressure = a })
+            (field "tangentialPressure" Decode.float)
+        >> andUpdate
+            (\e a -> { e | tiltX = a })
+            (field "tiltX" Decode.float)
+        >> andUpdate
+            (\e a -> { e | tiltY = a })
+            (field "tiltY" Decode.float)
+        >> andUpdate
+            (\e a -> { e | twist = a })
+            (field "twist" Decode.float)
+        >> andUpdate
+            (\e a -> { e | pointerType = a })
+            (field "pointerType"
+                (Decode.map inputTypeFromString Decode.string)
+            )
+        >> andUpdate
+            (\e a -> { e | isPrimary = a })
+            (field "isPrimary" Decode.bool)
+        >> andUpdate
+            (\e a -> { e | offsetX = a })
+            (field "offsetX" Decode.float)
+        >> andUpdate
+            (\e a -> { e | offsetY = a })
+            (field "offsetY" Decode.float)
+        >> andUpdate
+            (\e a -> { e | screenX = a })
+            (field "screenX" Decode.float)
+        >> andUpdate
+            (\e a -> { e | screenY = a })
+            (field "screenY" Decode.float)
+        >> andUpdate
+            (\e a -> { e | pageX = a })
+            (field "pageX" Decode.float)
+        >> andUpdate
+            (\e a -> { e | pageY = a })
+            (field "pageY" Decode.float)
+        >> andUpdate
+            (\e a -> { e | timeStamp = a })
+            (field "timeStamp" Decode.float)
 --}
 
 
 on : String -> (Event -> msg) -> Html.Attribute msg
 on event tag =
-    eventDecoder
+    eventDecoderWithDefault defaultEvent
         |> Decode.map tag
         |> Html.Events.on event
 
