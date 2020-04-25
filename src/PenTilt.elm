@@ -1,10 +1,10 @@
-module PenTilt exposing (Cartesian, Spherical, Tilt, fromCartiesian, toCartesian, toSpherical)
+module PenTilt exposing (Cartesian, Spherical, Tilt, fromCartiesian, fromSpherical, toCartesian, toSpherical)
 
 
 type alias Tilt =
     { r : Float
-    , x : Float
-    , y : Float
+    , tiltX : Float
+    , tiltY : Float
     }
 
 
@@ -22,71 +22,77 @@ type alias Spherical =
     }
 
 
-radToDec : Float -> Float
-radToDec rad =
-    rad * 1
-
-
-
---(180 / pi)
-
-
 toCartesian : Tilt -> Cartesian
-toCartesian tilt =
+toCartesian { r, tiltX, tiltY } =
     let
-        -- These come from the cross product of
+        -- Take the cross product of
         -- the two normal vetors from the two
         -- tilt planes
         x =
-            sin tilt.x * cos tilt.y
+            sin tiltX * cos tiltY
 
         y =
-            cos tilt.x * sin tilt.y
+            cos tiltX * sin tiltY
 
         z =
-            cos tilt.x * cos tilt.y
-
-        length =
-            sqrt (x ^ 2 + y ^ 2 + z ^ 2)
+            cos tiltX * cos tiltY
     in
-    Cartesian (x / length) (y / length) (z / length)
+    Cartesian (x / r) (y / r) (z / r)
+
+
+fromCartiesian : Cartesian -> Tilt
+fromCartiesian { x, y, z } =
+    let
+        r =
+            sqrt (x ^ 2 + y ^ 2 + z ^ 2)
+
+        tiltX =
+            atan2 y z
+
+        tiltY =
+            atan2 x z
+    in
+    Tilt r tiltX tiltY
 
 
 cartiesian_to_spherical : Cartesian -> Spherical
-cartiesian_to_spherical cart =
+cartiesian_to_spherical { x, y, z } =
     let
         r =
-            sqrt (cart.x ^ 2 + cart.y ^ 2 + cart.z ^ 2)
+            sqrt (x ^ 2 + y ^ 2 + z ^ 2)
 
         theta =
-            radToDec <| atan2 (sqrt (cart.x ^ 2 + cart.y ^ 2)) cart.z
+            atan2 (sqrt (x ^ 2 + y ^ 2)) z
 
         phi =
-            radToDec <| atan2 cart.y cart.x
+            atan2 y x
     in
     Spherical r theta phi
 
 
-toSpherical : Tilt -> Spherical
-toSpherical tilt =
-    tilt
-        |> toCartesian
-        |> cartiesian_to_spherical
-
-
-fromCartiesian : Cartesian -> Tilt
-fromCartiesian cart =
+spherical_to_cartiesian : Spherical -> Cartesian
+spherical_to_cartiesian { r, theta, phi } =
     let
+        l =
+            r * sin theta
+
         x =
-            atan2 cart.y cart.z
+            l * sin phi
 
         y =
-            atan2 cart.x cart.z
+            l * cos phi
 
-        r =
-            [ cart.x, cart.y, cart.z ]
-                |> List.map (\a -> a ^ 2)
-                |> List.sum
-                |> sqrt
+        z =
+            r * cos theta
     in
-    Tilt r x y
+    Cartesian x y z
+
+
+toSpherical : Tilt -> Spherical
+toSpherical =
+    toCartesian >> cartiesian_to_spherical
+
+
+fromSpherical : Spherical -> Tilt
+fromSpherical =
+    spherical_to_cartiesian >> fromCartiesian
