@@ -1,4 +1,4 @@
-module PointerEventTests exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
+module PointerEventsTest exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
 
 import Browser
 import Element exposing (Column, column, fill, height, htmlAttribute, padding, spacing, table, text, width)
