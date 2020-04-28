@@ -5229,6 +5229,10 @@ var $author$project$PointerEventsTest$NoOp = {$: 'NoOp'};
 var $author$project$PointerEventsTest$Pointer = function (a) {
 	return {$: 'Pointer', a: a};
 };
+var $author$project$PenTilt$Tilt = F3(
+	function (r, tiltX, tiltY) {
+		return {r: r, tiltX: tiltX, tiltY: tiltY};
+	});
 var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
 };
@@ -10831,6 +10835,10 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var $elm$core$Basics$pi = _Basics_pi;
+var $elm$core$Basics$degrees = function (angleInDegrees) {
+	return (angleInDegrees * $elm$core$Basics$pi) / 180;
+};
 var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -11360,31 +11368,25 @@ var $author$project$Pointer$on = F2(
 	});
 var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
 var $author$project$Pointer$onMove = $author$project$Pointer$on('pointermove');
-var $author$project$PenTilt$Tilt = F3(
-	function (r, x, y) {
-		return {r: r, x: x, y: y};
-	});
 var $author$project$PenTilt$Spherical = F3(
 	function (r, theta, phi) {
 		return {phi: phi, r: r, theta: theta};
 	});
 var $elm$core$Basics$atan2 = _Basics_atan2;
 var $elm$core$Basics$pow = _Basics_pow;
-var $author$project$PenTilt$radToDec = function (rad) {
-	return rad * 1;
-};
 var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$PenTilt$cartiesian_to_spherical = function (cart) {
-	var theta = $author$project$PenTilt$radToDec(
-		A2(
-			$elm$core$Basics$atan2,
-			$elm$core$Basics$sqrt(
-				A2($elm$core$Basics$pow, cart.x, 2) + A2($elm$core$Basics$pow, cart.y, 2)),
-			cart.z));
+var $author$project$PenTilt$cartesian_to_spherical = function (_v0) {
+	var x = _v0.x;
+	var y = _v0.y;
+	var z = _v0.z;
+	var theta = A2(
+		$elm$core$Basics$atan2,
+		$elm$core$Basics$sqrt(
+			A2($elm$core$Basics$pow, x, 2) + A2($elm$core$Basics$pow, y, 2)),
+		(-1) * z);
 	var r = $elm$core$Basics$sqrt(
-		(A2($elm$core$Basics$pow, cart.x, 2) + A2($elm$core$Basics$pow, cart.y, 2)) + A2($elm$core$Basics$pow, cart.z, 2));
-	var phi = $author$project$PenTilt$radToDec(
-		A2($elm$core$Basics$atan2, cart.y, cart.x));
+		(A2($elm$core$Basics$pow, x, 2) + A2($elm$core$Basics$pow, y, 2)) + A2($elm$core$Basics$pow, z, 2));
+	var phi = A2($elm$core$Basics$atan2, y, x);
 	return A3($author$project$PenTilt$Spherical, r, theta, phi);
 };
 var $author$project$PenTilt$Cartesian = F3(
@@ -11392,19 +11394,77 @@ var $author$project$PenTilt$Cartesian = F3(
 		return {x: x, y: y, z: z};
 	});
 var $elm$core$Basics$cos = _Basics_cos;
+var $author$project$Vector3$cross = F2(
+	function (a, b) {
+		return {x: (a.y * b.z) - (a.z * b.y), y: (a.z * b.x) - (a.x * b.z), z: (a.x * b.y) - (a.y * b.x)};
+	});
+var $author$project$Vector3$Vector = F3(
+	function (x, y, z) {
+		return {x: x, y: y, z: z};
+	});
+var $author$project$Vector3$mapComponents = F2(
+	function (f, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var z = _v0.z;
+		return A3(
+			$author$project$Vector3$Vector,
+			f(x),
+			f(y),
+			f(z));
+	});
+var $author$project$Vector3$sumCompnents = function (_v0) {
+	var x = _v0.x;
+	var y = _v0.y;
+	var z = _v0.z;
+	return (x + y) + z;
+};
+var $author$project$Vector3$lengthSquared = A2(
+	$elm$core$Basics$composeR,
+	$author$project$Vector3$mapComponents(
+		function (i) {
+			return i * i;
+		}),
+	$author$project$Vector3$sumCompnents);
+var $author$project$Vector3$length = A2($elm$core$Basics$composeR, $author$project$Vector3$lengthSquared, $elm$core$Basics$sqrt);
+var $author$project$Vector3$direction = function (v) {
+	return A2(
+		$author$project$Vector3$mapComponents,
+		function (i) {
+			return i / $author$project$Vector3$length(v);
+		},
+		v);
+};
+var $author$project$Vector3$scale = function (scaleFactor) {
+	return $author$project$Vector3$mapComponents(
+		$elm$core$Basics$mul(scaleFactor));
+};
 var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$PenTilt$toCartesian = function (tilt) {
-	var z = $elm$core$Basics$cos(tilt.x) * $elm$core$Basics$cos(tilt.y);
-	var y = $elm$core$Basics$cos(tilt.x) * $elm$core$Basics$sin(tilt.y);
-	var x = $elm$core$Basics$sin(tilt.x) * $elm$core$Basics$cos(tilt.y);
-	var length = $elm$core$Basics$sqrt(
-		(A2($elm$core$Basics$pow, x, 2) + A2($elm$core$Basics$pow, y, 2)) + A2($elm$core$Basics$pow, z, 2));
-	return A3($author$project$PenTilt$Cartesian, x / length, y / length, z / length);
+var $author$project$PenTilt$toCartesian = function (_v0) {
+	var r = _v0.r;
+	var tiltX = _v0.tiltX;
+	var tiltY = _v0.tiltY;
+	var py = {
+		x: 0,
+		y: (-1) * $elm$core$Basics$cos(tiltY),
+		z: (-1) * $elm$core$Basics$sin(tiltY)
+	};
+	var px = {
+		x: (-1) * $elm$core$Basics$cos(tiltX),
+		y: 0,
+		z: (-1) * $elm$core$Basics$sin(tiltX)
+	};
+	var _v1 = A2(
+		$author$project$Vector3$scale,
+		r,
+		$author$project$Vector3$direction(
+			A2($author$project$Vector3$cross, py, px)));
+	var x = _v1.x;
+	var y = _v1.y;
+	var z = _v1.z;
+	return A3($author$project$PenTilt$Cartesian, x, y, z);
 };
-var $author$project$PenTilt$toSpherical = function (tilt) {
-	return $author$project$PenTilt$cartiesian_to_spherical(
-		$author$project$PenTilt$toCartesian(tilt));
-};
+var $author$project$PenTilt$toSpherical = A2($elm$core$Basics$composeR, $author$project$PenTilt$toCartesian, $author$project$PenTilt$cartesian_to_spherical);
 var $elm$core$Basics$truncate = _Basics_truncate;
 var $author$project$PointerEventsTest$truncateTo = F2(
 	function (places, number) {
@@ -11742,6 +11802,7 @@ var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
+var $author$project$PointerEventsTest$toDegrees = $elm$core$Basics$mul(180 / $elm$core$Basics$pi);
 var $author$project$PointerEventsTest$touch = function (m) {
 	return _List_fromArray(
 		[
@@ -11824,7 +11885,7 @@ var $author$project$PointerEventsTest$view = function (model) {
 				]),
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$text('Pointer Events v2 Test'),
+					$mdgriffith$elm_ui$Element$text('Pointer Events v3 Test'),
 					A2(
 					$mdgriffith$elm_ui$Element$table,
 					_List_fromArray(
@@ -11901,6 +11962,38 @@ var $author$project$PointerEventsTest$view = function (model) {
 								function (p) {
 									return $mdgriffith$elm_ui$Element$text(
 										$elm$core$String$fromFloat(p.twist));
+								}),
+								A3(
+								$mdgriffith$elm_ui$Element$Column,
+								$mdgriffith$elm_ui$Element$text('Theta'),
+								$mdgriffith$elm_ui$Element$fill,
+								function (p) {
+									return $mdgriffith$elm_ui$Element$text(
+										$elm$core$String$fromInt(
+											$elm$core$Basics$round(
+												$author$project$PointerEventsTest$toDegrees(
+													$author$project$PenTilt$toSpherical(
+														A3(
+															$author$project$PenTilt$Tilt,
+															1,
+															$elm$core$Basics$degrees(p.tiltX),
+															$elm$core$Basics$degrees(p.tiltY))).theta))));
+								}),
+								A3(
+								$mdgriffith$elm_ui$Element$Column,
+								$mdgriffith$elm_ui$Element$text('Phi'),
+								$mdgriffith$elm_ui$Element$fill,
+								function (p) {
+									return $mdgriffith$elm_ui$Element$text(
+										$elm$core$String$fromInt(
+											$elm$core$Basics$round(
+												$author$project$PointerEventsTest$toDegrees(
+													$author$project$PenTilt$toSpherical(
+														A3(
+															$author$project$PenTilt$Tilt,
+															1,
+															$elm$core$Basics$degrees(p.tiltX),
+															$elm$core$Basics$degrees(p.tiltY))).phi))));
 								})
 							]),
 						data: $author$project$PointerEventsTest$orentation(model)

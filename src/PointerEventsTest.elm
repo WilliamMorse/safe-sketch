@@ -119,12 +119,37 @@ view model =
                     , Column (text "Twist")
                         fill
                         (\p -> text <| String.fromFloat p.twist)
+                    , Column (text "Theta")
+                        fill
+                        (\p ->
+                            text <|
+                                String.fromInt <|
+                                    round <|
+                                        toDegrees
+                                            (Tilt.toSpherical <|
+                                                Tilt.Tilt 1 (degrees p.tiltX) (degrees p.tiltY)
+                                            ).theta
+                        )
+                    , Column (text "Phi")
+                        fill
+                        (\p ->
+                            text <|
+                                String.fromInt <|
+                                    round <|
+                                        toDegrees
+                                            (Tilt.toSpherical <|
+                                                Tilt.Tilt 1 (degrees p.tiltX) (degrees p.tiltY)
+                                            ).phi
+                        )
+
+                    {--
                     , Column (text "Altitude")
                         fill
-                        (\p -> text <| String.fromFloat p.altitudeAngle)
+                        (\p -> text <| p.altitudeAngle)
                     , Column (text "Azimuth")
                         fill
-                        (\p -> text <| String.fromFloat p.azimuthAngle)
+                        (\p -> text <| p.azimuthAngle)
+                    --}
                     ]
                 }
 
@@ -209,8 +234,9 @@ orentation :
             , tiltX : Float
             , tiltY : Float
             , twist : Float
-            , altitudeAngle : Float
-            , azimuthAngle : Float
+
+            --, altitudeAngle : String
+            --, azimuthAngle : String
             }
 orentation m =
     let
@@ -223,8 +249,9 @@ orentation m =
       , theta = truncateTo 5 sph.theta
       , phi = truncateTo 5 sph.phi
       , twist = m.twist
-      , altitudeAngle = m.altitudeAngle
-      , azimuthAngle = m.azimuthAngle
+
+      --, altitudeAngle = truncateTo 5 m.altitudeAngle
+      --, azimuthAngle = truncateTo 5 m.azimuthAngle
       }
     ]
 
@@ -259,3 +286,8 @@ truncateTo places number =
     number
         |> String.fromFloat
         |> String.left (places + t)
+
+
+toDegrees : Float -> Float
+toDegrees =
+    (*) (180 / pi)
