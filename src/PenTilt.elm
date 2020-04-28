@@ -63,11 +63,6 @@ toCartesian { r, tiltX, tiltY } =
     Cartesian x y z
 
 
-upOrDown : Float -> Float -> Bool
-upOrDown a b =
-    sin (a / 2) + cos (b / 2) > 0
-
-
 
 {--| This is a strage function because the tiltXY cordinate system has areas of gimble lock (if both tiltX and tiltY are 90deg. In practice this is okay because the pen is never through the screen or completely flat against it, but it does pose a challange when different manufacurers choose different cordinate systems. Most screen cordinates are right handed with z into the screen but the coordinate system on the pointer events page is right handed, z out of the screen. This means that the tilt calculations will vary depending on the platform. On my chromebook the screen cordinates are right handed into the screen z so all the cartesan z values are negative in this file. It would be interesting to make a visualization to test this on other platforms.
 --}

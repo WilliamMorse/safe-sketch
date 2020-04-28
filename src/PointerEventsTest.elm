@@ -119,6 +119,12 @@ view model =
                     , Column (text "Twist")
                         fill
                         (\p -> text <| String.fromFloat p.twist)
+                    , Column (text "Altitude")
+                        fill
+                        (\p -> text <| String.fromFloat p.altitudeAngle)
+                    , Column (text "Azimuth")
+                        fill
+                        (\p -> text <| String.fromFloat p.azimuthAngle)
                     ]
                 }
 
@@ -203,6 +209,8 @@ orentation :
             , tiltX : Float
             , tiltY : Float
             , twist : Float
+            , altitudeAngle : Float
+            , azimuthAngle : Float
             }
 orentation m =
     let
@@ -215,6 +223,8 @@ orentation m =
       , theta = truncateTo 5 sph.theta
       , phi = truncateTo 5 sph.phi
       , twist = m.twist
+      , altitudeAngle = m.altitudeAngle
+      , azimuthAngle = m.azimuthAngle
       }
     ]
 

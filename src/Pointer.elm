@@ -20,6 +20,8 @@ type alias Event =
     , tiltX : Float
     , tiltY : Float
     , twist : Float
+    , altitudeAngle : Float
+    , azimuthAngle : Float
     , pointerType : DeviceType
     , isPrimary : Bool
     , offsetX : Float
@@ -62,6 +64,8 @@ eventDecoder =
         |> andMap (field "tiltX" Decode.float)
         |> andMap (field "tiltY" Decode.float)
         |> andMap (field "twist" Decode.float)
+        |> andMap (field "altitudeAngle" Decode.float)
+        |> andMap (field "azimuthAngle" Decode.float)
         |> andMap
             (field "pointerType"
                 (Decode.map inputTypeFromString
@@ -89,6 +93,8 @@ defaultEvent =
     , tiltX = 0
     , tiltY = 0
     , twist = 0
+    , altitudeAngle = 0
+    , azimuthAngle = 0
     , pointerType = Mouse
     , isPrimary = False
     , offsetX = 0
@@ -139,6 +145,12 @@ eventDecoderWithDefault =
         >> andUpdate
             (\e a -> { e | twist = a })
             (field "twist" Decode.float)
+        >> andUpdate
+            (\e a -> { e | altitudeAngle = a })
+            (field "altitudeAngle" Decode.float)
+        >> andUpdate
+            (\e a -> { e | azimuthAngle = a })
+            (field "azimuthAngle" Decode.float)
         >> andUpdate
             (\e a -> { e | pointerType = a })
             (field "pointerType"
