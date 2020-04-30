@@ -1,14 +1,38 @@
-module Pointer exposing (DeviceType(..), Event, blockContextMenu, defaultEvent, eventDecoder, onDown, onMove, onUp)
+module Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, defaultEvent, eventDecoder, onDown, onDownCompat, onMove, onMoveCompat, onUp, onUpCompat)
 
 import Html
 import Html.Events
 import Json.Decode as Decode exposing (Decoder, field)
+import Json.Decode.Extra exposing (optionalField, withDefault)
 
 
 type DeviceType
     = Mouse
     | Touch
     | Pen
+
+
+type alias CompatibilityEvent =
+    { pointerId : Maybe Float
+    , width : Maybe Float
+    , height : Maybe Float
+    , pressure : Maybe Float
+    , tangentialPressure : Maybe Float
+    , tiltX : Maybe Float
+    , tiltY : Maybe Float
+    , twist : Maybe Float
+    , altitudeAngle : Maybe Float
+    , azimuthAngle : Maybe Float
+    , pointerType : Maybe DeviceType
+    , isPrimary : Maybe Bool
+    , offsetX : Maybe Float
+    , offsetY : Maybe Float
+    , screenX : Maybe Float
+    , screenY : Maybe Float
+    , pageX : Maybe Float
+    , pageY : Maybe Float
+    , timeStamp : Maybe Float
+    }
 
 
 type alias Event =
@@ -20,9 +44,8 @@ type alias Event =
     , tiltX : Float
     , tiltY : Float
     , twist : Float
-
-    --, altitudeAngle : Float
-    --, azimuthAngle : Float
+    , altitudeAngle : Float
+    , azimuthAngle : Float
     , pointerType : DeviceType
     , isPrimary : Bool
     , offsetX : Float
@@ -54,6 +77,11 @@ andMap =
     Decode.map2 (|>)
 
 
+andWithDefault : a -> Decoder a -> Decoder (a -> value) -> Decoder value
+andWithDefault a decoder =
+    andMap (withDefault a decoder)
+
+
 eventDecoder : Decoder Event
 eventDecoder =
     Decode.succeed Event
@@ -65,8 +93,8 @@ eventDecoder =
         |> andMap (field "tiltX" Decode.float)
         |> andMap (field "tiltY" Decode.float)
         |> andMap (field "twist" Decode.float)
-        --|> andMap (field "altitudeAngle" Decode.float)
-        --|> andMap (field "azimuthAngle" Decode.float)
+        |> andMap (field "altitudeAngle" Decode.float)
+        |> andMap (field "azimuthAngle" Decode.float)
         |> andMap
             (field "pointerType"
                 (Decode.map inputTypeFromString
@@ -87,16 +115,15 @@ eventDecoder =
 defaultEvent : Event
 defaultEvent =
     { pointerId = -1
-    , width = 0
-    , height = 0
+    , width = 1
+    , height = 1
     , pressure = 0
     , tangentialPressure = 0
     , tiltX = 0
     , tiltY = 0
     , twist = 0
-
-    --    , altitudeAngle = pi / 2
-    --    , azimuthAngle = 0
+    , altitudeAngle = pi / 2
+    , azimuthAngle = 0
     , pointerType = Mouse
     , isPrimary = False
     , offsetX = 0
@@ -147,14 +174,12 @@ eventDecoderWithDefault =
         >> andUpdate
             (\e a -> { e | twist = a })
             (field "twist" Decode.float)
-        {--
         >> andUpdate
             (\e a -> { e | altitudeAngle = a })
             (field "altitudeAngle" Decode.float)
         >> andUpdate
             (\e a -> { e | azimuthAngle = a })
             (field "azimuthAngle" Decode.float)
-        --}
         >> andUpdate
             (\e a -> { e | pointerType = a })
             (field "pointerType"
@@ -185,6 +210,57 @@ eventDecoderWithDefault =
             (\e a -> { e | timeStamp = a })
             (field "timeStamp" Decode.float)
 --}
+
+
+compatibilityEventDecoder : Decoder CompatibilityEvent
+compatibilityEventDecoder =
+    Decode.succeed CompatibilityEvent
+        |> andMap (optionalField "pointerId" Decode.float)
+        |> andMap (optionalField "width" Decode.float)
+        |> andMap (optionalField "height" Decode.float)
+        |> andMap (optionalField "pressure" Decode.float)
+        |> andMap (optionalField "tangentialPressure" Decode.float)
+        |> andMap (optionalField "tiltX" Decode.float)
+        |> andMap (optionalField "tiltY" Decode.float)
+        |> andMap (optionalField "twist" Decode.float)
+        |> andMap (optionalField "altitudeAngle" Decode.float)
+        |> andMap (optionalField "azimuthAngle" Decode.float)
+        |> andMap
+            (optionalField "pointerType"
+                (Decode.map inputTypeFromString
+                    Decode.string
+                )
+            )
+        |> andMap (optionalField "isPrimary" Decode.bool)
+        |> andMap (optionalField "offsetX" Decode.float)
+        |> andMap (optionalField "offsetY" Decode.float)
+        |> andMap (optionalField "screenX" Decode.float)
+        |> andMap (optionalField "screenY" Decode.float)
+        |> andMap (optionalField "pageX" Decode.float)
+        |> andMap (optionalField "pageY" Decode.float)
+        |> andMap (optionalField "timeStamp" Decode.float)
+
+
+onCompat : String -> (CompatibilityEvent -> msg) -> Html.Attribute msg
+onCompat event tag =
+    compatibilityEventDecoder
+        |> Decode.map tag
+        |> Html.Events.on event
+
+
+onDownCompat : (CompatibilityEvent -> msg) -> Html.Attribute msg
+onDownCompat =
+    onCompat "pointerdown"
+
+
+onMoveCompat : (CompatibilityEvent -> msg) -> Html.Attribute msg
+onMoveCompat =
+    onCompat "pointermove"
+
+
+onUpCompat : (CompatibilityEvent -> msg) -> Html.Attribute msg
+onUpCompat =
+    onCompat "pointerup"
 
 
 on : String -> (Event -> msg) -> Html.Attribute msg

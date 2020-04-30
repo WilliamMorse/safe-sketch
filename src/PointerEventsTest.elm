@@ -1,15 +1,15 @@
 module PointerEventsTest exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
 
 import Browser
-import Element exposing (Column, column, fill, height, htmlAttribute, padding, spacing, table, text, width)
+import Element exposing (Column, Element, alignRight, column, el, fill, height, htmlAttribute, padding, spacing, table, text, width)
+import Element.Background as Backround
 import Element.Border as Border
 import Element.Font as Font
 import Html exposing (Html)
 import Html.Attributes
-import Html.Events
 import Json.Decode as D
 import PenTilt as Tilt
-import Pointer exposing (DeviceType(..), Event, defaultEvent, onDown, onMove)
+import Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, defaultEvent, onDownCompat, onMoveCompat)
 
 
 main : Program () Model Msg
@@ -26,18 +26,209 @@ type alias Point =
     ( Float, Float )
 
 
+type Feature a
+    = Disabled
+    | Decoded a
+    | Active a
+
+
+type alias FeatureEvent =
+    { pointerId : Feature Float
+    , width : Feature Float
+    , height : Feature Float
+    , pressure : Feature Float
+    , tangentialPressure : Feature Float
+    , tiltX : Feature Float
+    , tiltY : Feature Float
+    , twist : Feature Float
+    , altitudeAngle : Feature Float
+    , azimuthAngle : Feature Float
+    , pointerType : Feature DeviceType
+    , isPrimary : Feature Bool
+    , offsetX : Feature Float
+    , offsetY : Feature Float
+    , screenX : Feature Float
+    , screenY : Feature Float
+    , pageX : Feature Float
+    , pageY : Feature Float
+    , timeStamp : Feature Float
+    }
+
+
+checkFeature : a -> Maybe a -> Feature a -> Feature a
+checkFeature defaultValue decodedValue modelValue =
+    case modelValue of
+        Active a ->
+            case decodedValue of
+                Just b ->
+                    Active b
+
+                Nothing ->
+                    modelValue
+
+        Decoded a ->
+            case decodedValue of
+                Just b ->
+                    if b == defaultValue then
+                        Decoded b
+
+                    else
+                        Active b
+
+                Nothing ->
+                    Disabled
+
+        Disabled ->
+            case decodedValue of
+                Just b ->
+                    if b == defaultValue then
+                        Decoded b
+
+                    else
+                        Active b
+
+                Nothing ->
+                    Disabled
+
+
+detectFeatures : Event -> CompatibilityEvent -> FeatureEvent -> FeatureEvent
+detectFeatures ev compEv modelEv =
+    { pointerId =
+        checkFeature
+            ev.pointerId
+            compEv.pointerId
+            modelEv.pointerId
+    , width =
+        checkFeature
+            ev.width
+            compEv.width
+            modelEv.width
+    , height =
+        checkFeature
+            ev.height
+            compEv.height
+            modelEv.height
+    , pressure =
+        checkFeature
+            ev.pressure
+            compEv.pressure
+            modelEv.pressure
+    , tangentialPressure =
+        checkFeature
+            ev.tangentialPressure
+            compEv.tangentialPressure
+            modelEv.tangentialPressure
+    , tiltX =
+        checkFeature
+            ev.tiltX
+            compEv.tiltX
+            modelEv.tiltX
+    , tiltY =
+        checkFeature
+            ev.tiltY
+            compEv.tiltY
+            modelEv.tiltY
+    , twist =
+        checkFeature
+            ev.twist
+            compEv.twist
+            modelEv.twist
+    , altitudeAngle =
+        checkFeature
+            ev.altitudeAngle
+            compEv.altitudeAngle
+            modelEv.altitudeAngle
+    , azimuthAngle =
+        checkFeature
+            ev.azimuthAngle
+            compEv.azimuthAngle
+            modelEv.azimuthAngle
+    , pointerType =
+        checkFeature
+            ev.pointerType
+            compEv.pointerType
+            modelEv.pointerType
+    , isPrimary =
+        checkFeature
+            ev.isPrimary
+            compEv.isPrimary
+            modelEv.isPrimary
+    , offsetX =
+        checkFeature
+            ev.offsetX
+            compEv.offsetX
+            modelEv.offsetX
+    , offsetY =
+        checkFeature
+            ev.offsetY
+            compEv.offsetY
+            modelEv.offsetY
+    , screenX =
+        checkFeature
+            ev.screenX
+            compEv.screenX
+            modelEv.screenX
+    , screenY =
+        checkFeature
+            ev.screenY
+            compEv.screenY
+            modelEv.screenY
+    , pageX =
+        checkFeature
+            ev.pageX
+            compEv.pageX
+            modelEv.pageX
+    , pageY =
+        checkFeature
+            ev.pageY
+            compEv.pageY
+            modelEv.pageY
+    , timeStamp =
+        checkFeature
+            ev.timeStamp
+            compEv.timeStamp
+            modelEv.timeStamp
+    }
+
+
 type alias Model =
-    Event
+    { pointerEvent : FeatureEvent
+    , debugEvent : String
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( defaultEvent, Cmd.none )
+    ( Model
+        { pointerId = Disabled
+        , width = Disabled
+        , height = Disabled
+        , pressure = Disabled
+        , tangentialPressure = Disabled
+        , tiltX = Disabled
+        , tiltY = Disabled
+        , twist = Disabled
+        , altitudeAngle = Disabled
+        , azimuthAngle = Disabled
+        , pointerType = Disabled
+        , isPrimary = Disabled
+        , offsetX = Disabled
+        , offsetY = Disabled
+        , screenX = Disabled
+        , screenY = Disabled
+        , pageX = Disabled
+        , pageY = Disabled
+        , timeStamp = Disabled
+        }
+        ""
+    , Cmd.none
+    )
 
 
 type Msg
     = NoOp
-    | Pointer Event
+    | Pointer CompatibilityEvent
+    | DebugEvent D.Value
 
 
 subscriptions : Model -> Sub Msg
@@ -52,18 +243,30 @@ update msg model =
             ( model, Cmd.none )
 
         Pointer ev ->
-            ( ev, Cmd.none )
+            ( { model
+                | pointerEvent =
+                    detectFeatures defaultEvent ev model.pointerEvent
+              }
+            , Cmd.none
+            )
+
+        DebugEvent val ->
+            ( { model | debugEvent = "hI" ++ Debug.toString val }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
+    let
+        ev =
+            model.pointerEvent
+    in
     Element.layout
         [ width fill
         , height fill
         , htmlAttribute <| Html.Attributes.style "touch-action" "none"
         , htmlAttribute <| Html.Attributes.style "user-select" "none"
-        , htmlAttribute <| onDown Pointer
-        , htmlAttribute <| onMove Pointer
+        , htmlAttribute <| onDownCompat Pointer
+        , htmlAttribute <| onMoveCompat Pointer
         , htmlAttribute <| blockContextMenu NoOp
 
         --, htmlAttribute <| onUp Pointer
@@ -75,7 +278,7 @@ view model =
             , Font.variant Font.tabularNumbers
             , Element.alignRight
             ]
-            [ text "Pointer Events v2 Test"
+            [ text "Pointer Events v3 Test"
 
             -- POSITION
             , table
@@ -83,7 +286,7 @@ view model =
                 , Border.width 2
                 , padding 10
                 ]
-                { data = position model
+                { data = position model.pointerEvent
                 , columns =
                     [ Column
                         (text "")
@@ -100,176 +303,182 @@ view model =
 
             -- ORENTATION
             , table
-                [ spacing 10
-                , Border.width 2
+                [ Border.width 2
                 , padding 10
+                , Element.spacingXY 12 0
                 ]
-                { data = orentation model
+                { data = orentation model.pointerEvent
                 , columns =
                     [ Column
-                        (text "")
+                        (el [ padding 5 ] <| text "")
                         fill
-                        (\p -> text <| p.label)
-                    , Column (text "Tilt x")
+                        (\p -> el [ padding 5 ] <| text <| p.label)
+                    , Column (tableCell ev.tiltX <| text "Tilt x")
                         fill
-                        (\p -> text <| String.fromFloat p.tiltX)
-                    , Column (text "Tilt y")
-                        fill
-                        (\p -> text <| String.fromFloat p.tiltY)
-                    , Column (text "Twist")
-                        fill
-                        (\p -> text <| String.fromFloat p.twist)
-                    , Column (text "Theta")
-                        fill
-                        (\p ->
-                            text <|
-                                String.fromInt <|
-                                    round <|
-                                        toDegrees
-                                            (Tilt.toSpherical <|
-                                                Tilt.Tilt 1 (degrees p.tiltX) (degrees p.tiltY)
-                                            ).theta
+                        (.tiltX
+                            >> String.fromFloat
+                            >> text
+                            >> tableCell ev.tiltX
                         )
-                    , Column (text "Phi")
+                    , Column (tableCell ev.tiltY <| text "Tilt y")
                         fill
-                        (\p ->
-                            text <|
-                                String.fromInt <|
-                                    round <|
-                                        toDegrees
-                                            (Tilt.toSpherical <|
-                                                Tilt.Tilt 1 (degrees p.tiltX) (degrees p.tiltY)
-                                            ).phi
-                        )
+                        (\p -> tableCell ev.tiltY <| text <| String.fromFloat p.tiltY)
+                    , Column (tableCell ev.twist <| text "Twist")
+                        fill
+                        (\p -> tableCell ev.twist <| text <| String.fromFloat p.twist)
 
-                    {--
-                    , Column (text "Altitude")
+                    {--}
+                    , Column
+                        (tableCell ev.altitudeAngle <|
+                            text "Altitude"
+                        )
                         fill
-                        (\p -> text <| p.altitudeAngle)
-                    , Column (text "Azimuth")
+                        (.altitudeAngle
+                            >> toDegrees
+                            >> round
+                            >> String.fromInt
+                            >> text
+                            >> tableCell ev.altitudeAngle
+                        )
+                    , Column (tableCell ev.azimuthAngle <| text "Azimuth")
                         fill
-                        (\p -> text <| p.azimuthAngle)
-                    --}
+                        (.azimuthAngle
+                            >> toDegrees
+                            >> round
+                            >> String.fromInt
+                            >> text
+                            >> tableCell ev.azimuthAngle
+                        )
                     ]
                 }
 
             -- PRESSURE
             , table
-                [ spacing 10
+                [ Element.spacingXY 12 0
                 , Border.width 2
                 , padding 10
                 ]
-                { data = pressure model
+                { data = pressure model.pointerEvent
                 , columns =
                     [ Column
                         (text "")
                         fill
                         (\p -> text <| p.label)
                     , Column
-                        (text "Pressure")
+                        (tableCell ev.pressure <| text "Pressure")
                         fill
-                        (\p -> text <| p.press)
+                        (\p -> tableCell ev.pressure <| text <| p.press)
                     , Column
-                        (text "Tangential Pressure")
+                        (tableCell ev.tangentialPressure <| text "Tangential Pressure")
                         fill
-                        (\p -> text <| p.tanPress)
+                        (\p -> tableCell ev.tangentialPressure <| text <| p.tanPress)
                     ]
                 }
             , table
-                [ spacing 10
+                [ Element.spacingXY 12 0
                 , Border.width 2
                 , padding 10
                 ]
-                { data = touch model
+                { data = touch model.pointerEvent
                 , columns =
                     [ Column
                         (text "")
                         fill
                         (\p -> text <| p.label)
                     , Column
-                        (text "Height")
+                        (tableCell ev.height <| text "Height")
                         fill
-                        (\p -> text <| p.height)
+                        (\p -> tableCell ev.height <| text <| p.height)
                     , Column
-                        (text "Width")
+                        (tableCell ev.width <| text "Width")
                         fill
-                        (\p -> text <| p.width)
+                        (\p -> tableCell ev.width <| text <| p.width)
                     ]
                 }
+            , text model.debugEvent
             ]
         )
 
 
-blockContextMenu : Msg -> Html.Attribute Msg
-blockContextMenu msg =
-    Html.Events.preventDefaultOn
-        "contextmenu"
-        (D.map (\m -> ( m, True )) (D.succeed msg))
+tableCell : Feature a -> Element msg -> Element msg
+tableCell m =
+    case m of
+        Active _ ->
+            el [ padding 5, Backround.color (Element.rgb 0.5 1 0.5) ]
+
+        Decoded _ ->
+            el [ padding 5 ]
+
+        Disabled ->
+            el [ padding 5, Backround.color (Element.rgb 1 0.65 0.65) ]
 
 
-position : Model -> List { label : String, x : String, y : String }
+maybeFromFeature : Feature a -> Maybe a
+maybeFromFeature feature =
+    case feature of
+        Disabled ->
+            Nothing
+
+        Active a ->
+            Just a
+
+        Decoded a ->
+            Just a
+
+
+position : FeatureEvent -> List { label : String, x : String, y : String }
 position m =
     [ { label = "Screen Position"
-      , x = truncateTo 5 m.screenX
-      , y = truncateTo 5 m.screenY
+      , x = truncateTo 5 <| Maybe.withDefault defaultEvent.screenX <| maybeFromFeature m.screenX
+      , y = truncateTo 5 <| Maybe.withDefault defaultEvent.screenY <| maybeFromFeature m.screenY
       }
     , { label = "Page Position"
-      , x = truncateTo 5 m.pageX
-      , y = truncateTo 5 m.pageY
+      , x = truncateTo 5 <| Maybe.withDefault defaultEvent.pageX <| maybeFromFeature m.pageX
+      , y = truncateTo 5 <| Maybe.withDefault defaultEvent.pageY <| maybeFromFeature m.pageY
       }
     , { label = "Offset Position"
-      , x = truncateTo 5 m.offsetX
-      , y = truncateTo 5 m.offsetY
+      , x = truncateTo 5 <| Maybe.withDefault defaultEvent.offsetX <| maybeFromFeature m.offsetX
+      , y = truncateTo 5 <| Maybe.withDefault defaultEvent.offsetY <| maybeFromFeature m.offsetY
       }
     ]
 
 
 orentation :
-    Event
+    FeatureEvent
     ->
         List
             { label : String
-            , phi : String
-            , theta : String
             , tiltX : Float
             , tiltY : Float
             , twist : Float
-
-            --, altitudeAngle : String
-            --, azimuthAngle : String
+            , altitudeAngle : Float
+            , azimuthAngle : Float
             }
 orentation m =
-    let
-        sph =
-            Tilt.toSpherical (Tilt.Tilt 1 m.tiltX m.tiltY)
-    in
     [ { label = "Pen Orentation"
-      , tiltX = m.tiltX
-      , tiltY = m.tiltY
-      , theta = truncateTo 5 sph.theta
-      , phi = truncateTo 5 sph.phi
-      , twist = m.twist
-
-      --, altitudeAngle = truncateTo 5 m.altitudeAngle
-      --, azimuthAngle = truncateTo 5 m.azimuthAngle
+      , tiltX = Maybe.withDefault defaultEvent.tiltX <| maybeFromFeature m.tiltX
+      , tiltY = Maybe.withDefault defaultEvent.tiltY <| maybeFromFeature m.tiltY
+      , twist = Maybe.withDefault defaultEvent.twist <| maybeFromFeature m.twist
+      , altitudeAngle = Maybe.withDefault defaultEvent.altitudeAngle <| maybeFromFeature m.altitudeAngle
+      , azimuthAngle = Maybe.withDefault defaultEvent.azimuthAngle <| maybeFromFeature m.azimuthAngle
       }
     ]
 
 
-pressure : Event -> List { label : String, press : String, tanPress : String }
+pressure : FeatureEvent -> List { label : String, press : String, tanPress : String }
 pressure m =
     [ { label = "Pen Force Sensors"
-      , press = truncateTo 5 m.pressure
-      , tanPress = truncateTo 5 m.tangentialPressure
+      , press = truncateTo 5 <| Maybe.withDefault defaultEvent.pressure <| maybeFromFeature m.pressure
+      , tanPress = truncateTo 5 <| Maybe.withDefault defaultEvent.tangentialPressure <| maybeFromFeature m.tangentialPressure
       }
     ]
 
 
-touch : Event -> List { label : String, height : String, width : String }
+touch : FeatureEvent -> List { label : String, height : String, width : String }
 touch m =
     [ { label = "Touch"
-      , height = truncateTo 5 m.height
-      , width = truncateTo 5 m.width
+      , height = truncateTo 5 <| Maybe.withDefault defaultEvent.height <| maybeFromFeature m.height
+      , width = truncateTo 5 <| Maybe.withDefault defaultEvent.width <| maybeFromFeature m.width
       }
     ]
 
