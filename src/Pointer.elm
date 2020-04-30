@@ -12,29 +12,6 @@ type DeviceType
     | Pen
 
 
-type alias CompatibilityEvent =
-    { pointerId : Maybe Float
-    , width : Maybe Float
-    , height : Maybe Float
-    , pressure : Maybe Float
-    , tangentialPressure : Maybe Float
-    , tiltX : Maybe Float
-    , tiltY : Maybe Float
-    , twist : Maybe Float
-    , altitudeAngle : Maybe Float
-    , azimuthAngle : Maybe Float
-    , pointerType : Maybe DeviceType
-    , isPrimary : Maybe Bool
-    , offsetX : Maybe Float
-    , offsetY : Maybe Float
-    , screenX : Maybe Float
-    , screenY : Maybe Float
-    , pageX : Maybe Float
-    , pageY : Maybe Float
-    , timeStamp : Maybe Float
-    }
-
-
 type alias Event =
     { pointerId : Float
     , width : Float
@@ -212,6 +189,58 @@ eventDecoderWithDefault =
 --}
 
 
+on : String -> (Event -> msg) -> Html.Attribute msg
+on event tag =
+    eventDecoderWithDefault defaultEvent
+        |> Decode.map tag
+        |> Html.Events.on event
+
+
+onDown : (Event -> msg) -> Html.Attribute msg
+onDown =
+    on "pointerdown"
+
+
+onMove : (Event -> msg) -> Html.Attribute msg
+onMove =
+    on "pointermove"
+
+
+onUp : (Event -> msg) -> Html.Attribute msg
+onUp =
+    on "pointerup"
+
+
+blockContextMenu : msg -> Html.Attribute msg
+blockContextMenu msg =
+    Html.Events.preventDefaultOn
+        "contextmenu"
+        (Decode.map (\m -> ( m, True )) (Decode.succeed msg))
+
+
+type alias CompatibilityEvent =
+    { pointerId : Maybe Float
+    , width : Maybe Float
+    , height : Maybe Float
+    , pressure : Maybe Float
+    , tangentialPressure : Maybe Float
+    , tiltX : Maybe Float
+    , tiltY : Maybe Float
+    , twist : Maybe Float
+    , altitudeAngle : Maybe Float
+    , azimuthAngle : Maybe Float
+    , pointerType : Maybe DeviceType
+    , isPrimary : Maybe Bool
+    , offsetX : Maybe Float
+    , offsetY : Maybe Float
+    , screenX : Maybe Float
+    , screenY : Maybe Float
+    , pageX : Maybe Float
+    , pageY : Maybe Float
+    , timeStamp : Maybe Float
+    }
+
+
 compatibilityEventDecoder : Decoder CompatibilityEvent
 compatibilityEventDecoder =
     Decode.succeed CompatibilityEvent
@@ -261,32 +290,3 @@ onMoveCompat =
 onUpCompat : (CompatibilityEvent -> msg) -> Html.Attribute msg
 onUpCompat =
     onCompat "pointerup"
-
-
-on : String -> (Event -> msg) -> Html.Attribute msg
-on event tag =
-    eventDecoderWithDefault defaultEvent
-        |> Decode.map tag
-        |> Html.Events.on event
-
-
-onDown : (Event -> msg) -> Html.Attribute msg
-onDown =
-    on "pointerdown"
-
-
-onMove : (Event -> msg) -> Html.Attribute msg
-onMove =
-    on "pointermove"
-
-
-onUp : (Event -> msg) -> Html.Attribute msg
-onUp =
-    on "pointerup"
-
-
-blockContextMenu : msg -> Html.Attribute msg
-blockContextMenu msg =
-    Html.Events.preventDefaultOn
-        "contextmenu"
-        (Decode.map (\m -> ( m, True )) (Decode.succeed msg))

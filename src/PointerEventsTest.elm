@@ -1,4 +1,4 @@
-module PointerEventsTest exposing (Model, Msg(..), Point, init, main, subscriptions, update, view)
+module PointerEventsTest exposing (Model, Msg(..), init, main, subscriptions, update, view)
 
 import Browser
 import Element exposing (Column, Element, alignRight, column, el, fill, height, htmlAttribute, padding, spacing, table, text, width)
@@ -8,7 +8,6 @@ import Element.Font as Font
 import Html exposing (Html)
 import Html.Attributes
 import Json.Decode as D
-import PenTilt as Tilt
 import Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, defaultEvent, onDownCompat, onMoveCompat)
 
 
@@ -20,10 +19,6 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
-
-
-type alias Point =
-    ( Float, Float )
 
 
 type Feature a
@@ -58,7 +53,7 @@ type alias FeatureEvent =
 checkFeature : a -> Maybe a -> Feature a -> Feature a
 checkFeature defaultValue decodedValue modelValue =
     case modelValue of
-        Active a ->
+        Active _ ->
             case decodedValue of
                 Just b ->
                     Active b
@@ -66,7 +61,7 @@ checkFeature defaultValue decodedValue modelValue =
                 Nothing ->
                     modelValue
 
-        Decoded a ->
+        Decoded _ ->
             case decodedValue of
                 Just b ->
                     if b == defaultValue then
