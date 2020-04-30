@@ -1,4 +1,4 @@
-module Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, defaultEvent, eventDecoder, onDown, onDownCompat, onMove, onMoveCompat, onUp, onUpCompat)
+module Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, compatibilityEventFromEvent, defaultEvent, eventDecoder, onDown, onDownCompat, onMove, onMoveCompat, onUp, onUpCompat)
 
 import Html
 import Html.Events
@@ -99,7 +99,7 @@ defaultEvent =
     , tiltX = 0
     , tiltY = 0
     , twist = 0
-    , altitudeAngle = pi / 2
+    , altitudeAngle = 0
     , azimuthAngle = 0
     , pointerType = Mouse
     , isPrimary = False
@@ -268,6 +268,30 @@ compatibilityEventDecoder =
         |> andMap (optionalField "pageX" Decode.float)
         |> andMap (optionalField "pageY" Decode.float)
         |> andMap (optionalField "timeStamp" Decode.float)
+
+
+compatibilityEventFromEvent : Event -> CompatibilityEvent
+compatibilityEventFromEvent { pointerId, width, height, pressure, tangentialPressure, tiltX, tiltY, twist, altitudeAngle, azimuthAngle, pointerType, isPrimary, offsetX, offsetY, screenX, screenY, pageX, pageY, timeStamp } =
+    CompatibilityEvent
+        (Just pointerId)
+        (Just width)
+        (Just height)
+        (Just pressure)
+        (Just tangentialPressure)
+        (Just tiltX)
+        (Just tiltY)
+        (Just twist)
+        (Just altitudeAngle)
+        (Just azimuthAngle)
+        (Just pointerType)
+        (Just isPrimary)
+        (Just offsetX)
+        (Just offsetY)
+        (Just screenX)
+        (Just screenY)
+        (Just pageX)
+        (Just pageY)
+        (Just timeStamp)
 
 
 onCompat : String -> (CompatibilityEvent -> msg) -> Html.Attribute msg

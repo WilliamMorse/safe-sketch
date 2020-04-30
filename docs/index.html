@@ -5204,25 +5204,91 @@ var $author$project$PointerEventsTest$Model = F2(
 	function (pointerEvent, debugEvent) {
 		return {debugEvent: debugEvent, pointerEvent: pointerEvent};
 	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$PointerEventsTest$init = _Utils_Tuple2(
-	A2(
-		$author$project$PointerEventsTest$Model,
-		{altitudeAngle: $author$project$PointerEventsTest$Disabled, azimuthAngle: $author$project$PointerEventsTest$Disabled, height: $author$project$PointerEventsTest$Disabled, isPrimary: $author$project$PointerEventsTest$Disabled, offsetX: $author$project$PointerEventsTest$Disabled, offsetY: $author$project$PointerEventsTest$Disabled, pageX: $author$project$PointerEventsTest$Disabled, pageY: $author$project$PointerEventsTest$Disabled, pointerId: $author$project$PointerEventsTest$Disabled, pointerType: $author$project$PointerEventsTest$Disabled, pressure: $author$project$PointerEventsTest$Disabled, screenX: $author$project$PointerEventsTest$Disabled, screenY: $author$project$PointerEventsTest$Disabled, tangentialPressure: $author$project$PointerEventsTest$Disabled, tiltX: $author$project$PointerEventsTest$Disabled, tiltY: $author$project$PointerEventsTest$Disabled, timeStamp: $author$project$PointerEventsTest$Disabled, twist: $author$project$PointerEventsTest$Disabled, width: $author$project$PointerEventsTest$Disabled},
-		''),
-	$elm$core$Platform$Cmd$none);
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$PointerEventsTest$subscriptions = function (_v0) {
-	return $elm$core$Platform$Sub$none;
+var $author$project$Pointer$CompatibilityEvent = function (pointerId) {
+	return function (width) {
+		return function (height) {
+			return function (pressure) {
+				return function (tangentialPressure) {
+					return function (tiltX) {
+						return function (tiltY) {
+							return function (twist) {
+								return function (altitudeAngle) {
+									return function (azimuthAngle) {
+										return function (pointerType) {
+											return function (isPrimary) {
+												return function (offsetX) {
+													return function (offsetY) {
+														return function (screenX) {
+															return function (screenY) {
+																return function (pageX) {
+																	return function (pageY) {
+																		return function (timeStamp) {
+																			return {altitudeAngle: altitudeAngle, azimuthAngle: azimuthAngle, height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialPressure: tangentialPressure, tiltX: tiltX, tiltY: tiltY, timeStamp: timeStamp, twist: twist, width: width};
+																		};
+																	};
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $author$project$Pointer$compatibilityEventFromEvent = function (_v0) {
+	var pointerId = _v0.pointerId;
+	var width = _v0.width;
+	var height = _v0.height;
+	var pressure = _v0.pressure;
+	var tangentialPressure = _v0.tangentialPressure;
+	var tiltX = _v0.tiltX;
+	var tiltY = _v0.tiltY;
+	var twist = _v0.twist;
+	var altitudeAngle = _v0.altitudeAngle;
+	var azimuthAngle = _v0.azimuthAngle;
+	var pointerType = _v0.pointerType;
+	var isPrimary = _v0.isPrimary;
+	var offsetX = _v0.offsetX;
+	var offsetY = _v0.offsetY;
+	var screenX = _v0.screenX;
+	var screenY = _v0.screenY;
+	var pageX = _v0.pageX;
+	var pageY = _v0.pageY;
+	var timeStamp = _v0.timeStamp;
+	return $author$project$Pointer$CompatibilityEvent(
+		$elm$core$Maybe$Just(pointerId))(
+		$elm$core$Maybe$Just(width))(
+		$elm$core$Maybe$Just(height))(
+		$elm$core$Maybe$Just(pressure))(
+		$elm$core$Maybe$Just(tangentialPressure))(
+		$elm$core$Maybe$Just(tiltX))(
+		$elm$core$Maybe$Just(tiltY))(
+		$elm$core$Maybe$Just(twist))(
+		$elm$core$Maybe$Just(altitudeAngle))(
+		$elm$core$Maybe$Just(azimuthAngle))(
+		$elm$core$Maybe$Just(pointerType))(
+		$elm$core$Maybe$Just(isPrimary))(
+		$elm$core$Maybe$Just(offsetX))(
+		$elm$core$Maybe$Just(offsetY))(
+		$elm$core$Maybe$Just(screenX))(
+		$elm$core$Maybe$Just(screenY))(
+		$elm$core$Maybe$Just(pageX))(
+		$elm$core$Maybe$Just(pageY))(
+		$elm$core$Maybe$Just(timeStamp));
 };
 var $author$project$Pointer$Mouse = {$: 'Mouse'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $elm$core$Basics$pi = _Basics_pi;
-var $author$project$Pointer$defaultEvent = {altitudeAngle: $elm$core$Basics$pi / 2, azimuthAngle: 0, height: 1, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialPressure: 0, tiltX: 0, tiltY: 0, timeStamp: 0, twist: 0, width: 1};
+var $author$project$Pointer$defaultEvent = {altitudeAngle: 0, azimuthAngle: 0, height: 1, isPrimary: false, offsetX: 0, offsetY: 0, pageX: 0, pageY: 0, pointerId: -1, pointerType: $author$project$Pointer$Mouse, pressure: 0, screenX: 0, screenY: 0, tangentialPressure: 0, tiltX: 0, tiltY: 0, timeStamp: 0, twist: 0, width: 1};
 var $author$project$PointerEventsTest$Active = function (a) {
 	return {$: 'Active', a: a};
 };
@@ -5233,7 +5299,6 @@ var $author$project$PointerEventsTest$checkFeature = F3(
 	function (defaultValue, decodedValue, modelValue) {
 		switch (modelValue.$) {
 			case 'Active':
-				var a = modelValue.a;
 				if (decodedValue.$ === 'Just') {
 					var b = decodedValue.a;
 					return $author$project$PointerEventsTest$Active(b);
@@ -5241,7 +5306,6 @@ var $author$project$PointerEventsTest$checkFeature = F3(
 					return modelValue;
 				}
 			case 'Decoded':
-				var a = modelValue.a;
 				if (decodedValue.$ === 'Just') {
 					var b = decodedValue.a;
 					return _Utils_eq(b, defaultValue) ? $author$project$PointerEventsTest$Decoded(b) : $author$project$PointerEventsTest$Active(b);
@@ -5281,6 +5345,23 @@ var $author$project$PointerEventsTest$detectFeatures = F3(
 			width: A3($author$project$PointerEventsTest$checkFeature, ev.width, compEv.width, modelEv.width)
 		};
 	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$PointerEventsTest$init = _Utils_Tuple2(
+	A2(
+		$author$project$PointerEventsTest$Model,
+		A3(
+			$author$project$PointerEventsTest$detectFeatures,
+			$author$project$Pointer$defaultEvent,
+			$author$project$Pointer$compatibilityEventFromEvent($author$project$Pointer$defaultEvent),
+			{altitudeAngle: $author$project$PointerEventsTest$Disabled, azimuthAngle: $author$project$PointerEventsTest$Disabled, height: $author$project$PointerEventsTest$Disabled, isPrimary: $author$project$PointerEventsTest$Disabled, offsetX: $author$project$PointerEventsTest$Disabled, offsetY: $author$project$PointerEventsTest$Disabled, pageX: $author$project$PointerEventsTest$Disabled, pageY: $author$project$PointerEventsTest$Disabled, pointerId: $author$project$PointerEventsTest$Disabled, pointerType: $author$project$PointerEventsTest$Disabled, pressure: $author$project$PointerEventsTest$Disabled, screenX: $author$project$PointerEventsTest$Disabled, screenY: $author$project$PointerEventsTest$Disabled, tangentialPressure: $author$project$PointerEventsTest$Disabled, tiltX: $author$project$PointerEventsTest$Disabled, tiltY: $author$project$PointerEventsTest$Disabled, timeStamp: $author$project$PointerEventsTest$Disabled, twist: $author$project$PointerEventsTest$Disabled, width: $author$project$PointerEventsTest$Disabled}),
+		''),
+	$elm$core$Platform$Cmd$none);
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$PointerEventsTest$subscriptions = function (_v0) {
+	return $elm$core$Platform$Sub$none;
+};
 var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$PointerEventsTest$update = F2(
 	function (msg, model) {
@@ -11221,45 +11302,6 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
-var $author$project$Pointer$CompatibilityEvent = function (pointerId) {
-	return function (width) {
-		return function (height) {
-			return function (pressure) {
-				return function (tangentialPressure) {
-					return function (tiltX) {
-						return function (tiltY) {
-							return function (twist) {
-								return function (altitudeAngle) {
-									return function (azimuthAngle) {
-										return function (pointerType) {
-											return function (isPrimary) {
-												return function (offsetX) {
-													return function (offsetY) {
-														return function (screenX) {
-															return function (screenY) {
-																return function (pageX) {
-																	return function (pageY) {
-																		return function (timeStamp) {
-																			return {altitudeAngle: altitudeAngle, azimuthAngle: azimuthAngle, height: height, isPrimary: isPrimary, offsetX: offsetX, offsetY: offsetY, pageX: pageX, pageY: pageY, pointerId: pointerId, pointerType: pointerType, pressure: pressure, screenX: screenX, screenY: screenY, tangentialPressure: tangentialPressure, tiltX: tiltX, tiltY: tiltY, timeStamp: timeStamp, twist: twist, width: width};
-																		};
-																	};
-																};
-															};
-														};
-													};
-												};
-											};
-										};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
 var $author$project$Pointer$andMap = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
@@ -11840,6 +11882,7 @@ var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
+var $elm$core$Basics$pi = _Basics_pi;
 var $author$project$PointerEventsTest$toDegrees = $elm$core$Basics$mul(180 / $elm$core$Basics$pi);
 var $author$project$PointerEventsTest$touch = function (m) {
 	return _List_fromArray(

@@ -9,6 +9,7 @@ import Html exposing (Html)
 import Html.Attributes
 import Json.Decode as D
 import Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, defaultEvent, onDownCompat, onMoveCompat)
+import Task
 
 
 main : Program () Model Msg
@@ -195,26 +196,28 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     ( Model
-        { pointerId = Disabled
-        , width = Disabled
-        , height = Disabled
-        , pressure = Disabled
-        , tangentialPressure = Disabled
-        , tiltX = Disabled
-        , tiltY = Disabled
-        , twist = Disabled
-        , altitudeAngle = Disabled
-        , azimuthAngle = Disabled
-        , pointerType = Disabled
-        , isPrimary = Disabled
-        , offsetX = Disabled
-        , offsetY = Disabled
-        , screenX = Disabled
-        , screenY = Disabled
-        , pageX = Disabled
-        , pageY = Disabled
-        , timeStamp = Disabled
-        }
+        ({ pointerId = Disabled
+         , width = Disabled
+         , height = Disabled
+         , pressure = Disabled
+         , tangentialPressure = Disabled
+         , tiltX = Disabled
+         , tiltY = Disabled
+         , twist = Disabled
+         , altitudeAngle = Disabled
+         , azimuthAngle = Disabled
+         , pointerType = Disabled
+         , isPrimary = Disabled
+         , offsetX = Disabled
+         , offsetY = Disabled
+         , screenX = Disabled
+         , screenY = Disabled
+         , pageX = Disabled
+         , pageY = Disabled
+         , timeStamp = Disabled
+         }
+            |> detectFeatures defaultEvent (Pointer.compatibilityEventFromEvent defaultEvent)
+        )
         ""
     , Cmd.none
     )
