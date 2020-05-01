@@ -91,7 +91,7 @@ eventDecoder =
 
 defaultEvent : Event
 defaultEvent =
-    { pointerId = -1
+    { pointerId = 0
     , width = 1
     , height = 1
     , pressure = 0
@@ -99,7 +99,7 @@ defaultEvent =
     , tiltX = 0
     , tiltY = 0
     , twist = 0
-    , altitudeAngle = 0
+    , altitudeAngle = 0 --pi/2
     , azimuthAngle = 0
     , pointerType = Mouse
     , isPrimary = False

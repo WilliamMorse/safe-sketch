@@ -226,7 +226,6 @@ init =
 type Msg
     = NoOp
     | Pointer CompatibilityEvent
-    | DebugEvent D.Value
 
 
 subscriptions : Model -> Sub Msg
@@ -247,9 +246,6 @@ update msg model =
               }
             , Cmd.none
             )
-
-        DebugEvent val ->
-            ( { model | debugEvent = "hI" ++ Debug.toString val }, Cmd.none )
 
 
 view : Model -> Html Msg
