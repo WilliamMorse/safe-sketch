@@ -29,14 +29,14 @@ type Feature a
 
 
 type alias FeatureEvent =
-    { pointerId : Feature Float
+    { pointerId : Feature Int
     , width : Feature Float
     , height : Feature Float
     , pressure : Feature Float
     , tangentialPressure : Feature Float
-    , tiltX : Feature Float
-    , tiltY : Feature Float
-    , twist : Feature Float
+    , tiltX : Feature Int
+    , tiltY : Feature Int
+    , twist : Feature Int
     , altitudeAngle : Feature Float
     , azimuthAngle : Feature Float
     , pointerType : Feature DeviceType
@@ -310,16 +310,16 @@ view model =
                     , Column (tableCell ev.tiltX <| text "Tilt x")
                         fill
                         (.tiltX
-                            >> String.fromFloat
+                            >> String.fromInt
                             >> text
                             >> tableCell ev.tiltX
                         )
                     , Column (tableCell ev.tiltY <| text "Tilt y")
                         fill
-                        (\p -> tableCell ev.tiltY <| text <| String.fromFloat p.tiltY)
+                        (\p -> tableCell ev.tiltY <| text <| String.fromInt p.tiltY)
                     , Column (tableCell ev.twist <| text "Twist")
                         fill
-                        (\p -> tableCell ev.twist <| text <| String.fromFloat p.twist)
+                        (\p -> tableCell ev.twist <| text <| String.fromInt p.twist)
 
                     {--}
                     , Column
@@ -442,9 +442,9 @@ orentation :
     ->
         List
             { label : String
-            , tiltX : Float
-            , tiltY : Float
-            , twist : Float
+            , tiltX : Int
+            , tiltY : Int
+            , twist : Int
             , altitudeAngle : Float
             , azimuthAngle : Float
             }

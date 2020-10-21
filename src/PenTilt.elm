@@ -1,4 +1,4 @@
-module PenTilt exposing (Cartesian, Spherical, Tilt, fromCartesian, fromSpherical, toCartesian, toSpherical)
+module PenTilt exposing (Cartesian, Spherical, Tilt, cartesian_to_spherical, fromCartesian, fromSpherical, toCartesian, toSpherical, toVector)
 
 import Vector3 as V3
 
@@ -124,3 +124,8 @@ toSpherical =
 fromSpherical : Spherical -> Tilt
 fromSpherical =
     spherical_to_cartesian >> fromCartesian
+
+
+toVector : Cartesian -> V3.Vector3
+toVector =
+    identity

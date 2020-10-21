@@ -1,4 +1,4 @@
-module Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, compatibilityEventFromEvent, defaultEvent, eventDecoder, onDown, onDownCompat, onMove, onMoveCompat, onUp, onUpCompat)
+module Pointer exposing (CompatibilityEvent, DeviceType(..), Event, blockContextMenu, compatibilityEventFromEvent, defaultEvent, eventDecoder, eventDecoderWithDefault, onDown, onDownCompat, onMove, onMoveCompat, onUp, onUpCompat)
 
 import Html
 import Html.Events
@@ -13,14 +13,14 @@ type DeviceType
 
 
 type alias Event =
-    { pointerId : Float
+    { pointerId : Int
     , width : Float
     , height : Float
     , pressure : Float
     , tangentialPressure : Float
-    , tiltX : Float
-    , tiltY : Float
-    , twist : Float
+    , tiltX : Int
+    , tiltY : Int
+    , twist : Int
     , altitudeAngle : Float
     , azimuthAngle : Float
     , pointerType : DeviceType
@@ -62,30 +62,30 @@ andWithDefault a decoder =
 eventDecoder : Decoder Event
 eventDecoder =
     Decode.succeed Event
-        |> andMap (field "pointerId" Decode.float)
-        |> andMap (field "width" Decode.float)
-        |> andMap (field "height" Decode.float)
-        |> andMap (field "pressure" Decode.float)
-        |> andMap (field "tangentialPressure" Decode.float)
-        |> andMap (field "tiltX" Decode.float)
-        |> andMap (field "tiltY" Decode.float)
-        |> andMap (field "twist" Decode.float)
-        |> andMap (field "altitudeAngle" Decode.float)
-        |> andMap (field "azimuthAngle" Decode.float)
-        |> andMap
+        |> andWithDefault defaultEvent.pointerId (field "pointerId" Decode.int)
+        |> andWithDefault defaultEvent.width (field "width" Decode.float)
+        |> andWithDefault defaultEvent.height (field "height" Decode.float)
+        |> andWithDefault defaultEvent.pressure (field "pressure" Decode.float)
+        |> andWithDefault defaultEvent.tangentialPressure (field "tangentialPressure" Decode.float)
+        |> andWithDefault defaultEvent.tiltX (field "tiltX" Decode.int)
+        |> andWithDefault defaultEvent.tiltY (field "tiltY" Decode.int)
+        |> andWithDefault defaultEvent.twist (field "twist" Decode.int)
+        |> andWithDefault defaultEvent.altitudeAngle (field "altitudeAngle" Decode.float)
+        |> andWithDefault defaultEvent.azimuthAngle (field "azimuthAngle" Decode.float)
+        |> andWithDefault defaultEvent.pointerType
             (field "pointerType"
                 (Decode.map inputTypeFromString
                     Decode.string
                 )
             )
-        |> andMap (field "isPrimary" Decode.bool)
-        |> andMap (field "offsetX" Decode.float)
-        |> andMap (field "offsetY" Decode.float)
-        |> andMap (field "screenX" Decode.float)
-        |> andMap (field "screenY" Decode.float)
-        |> andMap (field "pageX" Decode.float)
-        |> andMap (field "pageY" Decode.float)
-        |> andMap (field "timeStamp" Decode.float)
+        |> andWithDefault defaultEvent.isPrimary (field "isPrimary" Decode.bool)
+        |> andWithDefault defaultEvent.offsetX (field "offsetX" Decode.float)
+        |> andWithDefault defaultEvent.offsetY (field "offsetY" Decode.float)
+        |> andWithDefault defaultEvent.screenX (field "screenX" Decode.float)
+        |> andWithDefault defaultEvent.screenY (field "screenY" Decode.float)
+        |> andWithDefault defaultEvent.pageX (field "pageX" Decode.float)
+        |> andWithDefault defaultEvent.pageY (field "pageY" Decode.float)
+        |> andWithDefault defaultEvent.timeStamp (field "timeStamp" Decode.float)
 --}
 
 
@@ -99,7 +99,7 @@ defaultEvent =
     , tiltX = 0
     , tiltY = 0
     , twist = 0
-    , altitudeAngle = 0 --pi/2
+    , altitudeAngle = 90
     , azimuthAngle = 0
     , pointerType = Mouse
     , isPrimary = False
@@ -129,7 +129,7 @@ eventDecoderWithDefault =
     Decode.succeed
         >> andUpdate
             (\e a -> { e | pointerId = a })
-            (field "pointerId" Decode.float)
+            (field "pointerId" Decode.int)
         >> andUpdate
             (\e a -> { e | width = a })
             (field "width" Decode.float)
@@ -144,13 +144,13 @@ eventDecoderWithDefault =
             (field "tangentialPressure" Decode.float)
         >> andUpdate
             (\e a -> { e | tiltX = a })
-            (field "tiltX" Decode.float)
+            (field "tiltX" Decode.int)
         >> andUpdate
             (\e a -> { e | tiltY = a })
-            (field "tiltY" Decode.float)
+            (field "tiltY" Decode.int)
         >> andUpdate
             (\e a -> { e | twist = a })
-            (field "twist" Decode.float)
+            (field "twist" Decode.int)
         >> andUpdate
             (\e a -> { e | altitudeAngle = a })
             (field "altitudeAngle" Decode.float)
@@ -191,7 +191,7 @@ eventDecoderWithDefault =
 
 on : String -> (Event -> msg) -> Html.Attribute msg
 on event tag =
-    eventDecoderWithDefault defaultEvent
+    eventDecoder
         |> Decode.map tag
         |> Html.Events.on event
 
@@ -219,14 +219,14 @@ blockContextMenu msg =
 
 
 type alias CompatibilityEvent =
-    { pointerId : Maybe Float
+    { pointerId : Maybe Int
     , width : Maybe Float
     , height : Maybe Float
     , pressure : Maybe Float
     , tangentialPressure : Maybe Float
-    , tiltX : Maybe Float
-    , tiltY : Maybe Float
-    , twist : Maybe Float
+    , tiltX : Maybe Int
+    , tiltY : Maybe Int
+    , twist : Maybe Int
     , altitudeAngle : Maybe Float
     , azimuthAngle : Maybe Float
     , pointerType : Maybe DeviceType
@@ -244,14 +244,14 @@ type alias CompatibilityEvent =
 compatibilityEventDecoder : Decoder CompatibilityEvent
 compatibilityEventDecoder =
     Decode.succeed CompatibilityEvent
-        |> andMap (optionalField "pointerId" Decode.float)
+        |> andMap (optionalField "pointerId" Decode.int)
         |> andMap (optionalField "width" Decode.float)
         |> andMap (optionalField "height" Decode.float)
         |> andMap (optionalField "pressure" Decode.float)
         |> andMap (optionalField "tangentialPressure" Decode.float)
-        |> andMap (optionalField "tiltX" Decode.float)
-        |> andMap (optionalField "tiltY" Decode.float)
-        |> andMap (optionalField "twist" Decode.float)
+        |> andMap (optionalField "tiltX" Decode.int)
+        |> andMap (optionalField "tiltY" Decode.int)
+        |> andMap (optionalField "twist" Decode.int)
         |> andMap (optionalField "altitudeAngle" Decode.float)
         |> andMap (optionalField "azimuthAngle" Decode.float)
         |> andMap

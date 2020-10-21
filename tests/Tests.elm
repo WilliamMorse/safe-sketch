@@ -4,6 +4,7 @@ import Expect exposing (Expectation, FloatingPointTolerance(..))
 import Fuzz exposing (Fuzzer, int, list, string)
 import PenTilt exposing (Cartesian, Spherical, Tilt)
 import Test exposing (..)
+import Vector3 exposing (Vector3)
 
 
 withinCart : FloatingPointTolerance -> String -> Cartesian -> Cartesian -> Test
