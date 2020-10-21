@@ -5274,7 +5274,8 @@ var $author$project$Pointer$andWithDefault = F2(
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $author$project$Pointer$Mouse = 0;
-var $author$project$Pointer$defaultEvent = {aq: 90, ar: 0, at: 1, au: false, aw: 0, ax: 0, ay: 0, az: 0, aA: 0, aB: 0, aC: 0, aD: 0, aE: 0, aG: 0, d0: 0, d1: 0, aH: 0, aJ: 0, aL: 1};
+var $elm$core$Basics$pi = _Basics_pi;
+var $author$project$Pointer$defaultEvent = {aq: $elm$core$Basics$pi / 2, ar: 0, at: 1, au: false, aw: 0, ax: 0, ay: 0, az: 0, aA: 0, aB: 0, aC: 0, aD: 0, aE: 0, aG: 0, d0: 0, d1: 0, aH: 0, aJ: 0, aL: 1};
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $author$project$Pointer$Touch = 1;
@@ -11476,7 +11477,6 @@ var $terezka$line_charts$Internal$Line$line = F4(
 var $terezka$line_charts$LineChart$line = $terezka$line_charts$Internal$Line$line;
 var $terezka$line_charts$Internal$Dots$None = 0;
 var $terezka$line_charts$LineChart$Dots$none = 0;
-var $elm$core$Basics$pi = _Basics_pi;
 var $author$project$PenTilt$Tilt = F3(
 	function (r, tiltX, tiltY) {
 		return {bm: r, d0: tiltX, d1: tiltY};

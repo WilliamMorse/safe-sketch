@@ -5721,7 +5721,8 @@ var $author$project$Pointer$andWithDefault = F2(
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $author$project$Pointer$Mouse = 0;
-var $author$project$Pointer$defaultEvent = {am: 90, an: 0, ap: 1, aq: false, as: 0, at: 0, au: 0, av: 0, aw: 0, ax: 0, ay: 0, az: 0, aA: 0, aD: 0, aE: 0, aF: 0, aG: 0, aI: 0, aN: 1};
+var $elm$core$Basics$pi = _Basics_pi;
+var $author$project$Pointer$defaultEvent = {am: $elm$core$Basics$pi / 2, an: 0, ap: 1, aq: false, as: 0, at: 0, au: 0, av: 0, aw: 0, ax: 0, ay: 0, az: 0, aA: 0, aD: 0, aE: 0, aF: 0, aG: 0, aI: 0, aN: 1};
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $author$project$Pointer$Touch = 1;
 var $author$project$Pointer$inputTypeFromString = function (str) {
