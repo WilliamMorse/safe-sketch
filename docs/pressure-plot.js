@@ -5181,7 +5181,7 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$PressurePlot$Model = F2(
 	function (events, predictions) {
-		return {g: events, dA: predictions};
+		return {f: events, dA: predictions};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5406,7 +5406,7 @@ var $author$project$PressurePlot$update = F2(
 					return _Utils_Tuple2(
 						A2(
 							$author$project$PressurePlot$Model,
-							_Utils_ap(model.g, bundle.g),
+							_Utils_ap(model.f, bundle.f),
 							bundle.dA),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -11280,44 +11280,48 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{fX: _List_Nil});
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 0, a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $author$project$Pointer$on = F2(
-	function (event, tag) {
-		return A2(
-			$elm$html$Html$Events$on,
-			event,
-			A2($elm$json$Json$Decode$map, tag, $author$project$Pointer$eventDecoder));
-	});
-var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
-var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 7, a: a, b: b, c: c, d: d, e: e};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
-var $mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
-};
 var $author$project$PressurePlot$Point = F2(
 	function (x, y) {
 		return {aN: x, aO: y};
+	});
+var $avh4$elm_color$Color$RgbaSpace = F4(
+	function (a, b, c, d) {
+		return {$: 0, a: a, b: b, c: c, d: d};
+	});
+var $avh4$elm_color$Color$scaleFrom255 = function (c) {
+	return c / 255;
+};
+var $avh4$elm_color$Color$rgb255 = F3(
+	function (r, g, b) {
+		return A4(
+			$avh4$elm_color$Color$RgbaSpace,
+			$avh4$elm_color$Color$scaleFrom255(r),
+			$avh4$elm_color$Color$scaleFrom255(g),
+			$avh4$elm_color$Color$scaleFrom255(b),
+			1.0);
+	});
+var $terezka$line_charts$LineChart$Colors$blue = A3($avh4$elm_color$Color$rgb255, 3, 169, 244);
+var $author$project$PressurePlot$floatIndexedMap = F2(
+	function (f, li) {
+		return A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, a) {
+					return A2(f, i, a);
+				}),
+			li);
+	});
+var $author$project$Vector3$Line = F2(
+	function (point, dir) {
+		return {bx: dir, f$: point};
+	});
+var $author$project$Vector3$Plane = F2(
+	function (point, normal) {
+		return {$7: normal, f$: point};
+	});
+var $author$project$PenTilt$Spherical = F3(
+	function (r, theta, phi) {
+		return {dx: phi, bm: r, d$: theta};
 	});
 var $author$project$Vector2$Vector2 = F2(
 	function (x, y) {
@@ -11351,31 +11355,10 @@ var $author$project$Vector2$angleBetween = F2(
 		var abCosAlpha = A2($author$project$Vector2$dot, a, b);
 		return A2($elm$core$Basics$atan2, abSinAlpha, abCosAlpha);
 	});
-var $avh4$elm_color$Color$RgbaSpace = F4(
-	function (a, b, c, d) {
-		return {$: 0, a: a, b: b, c: c, d: d};
-	});
-var $avh4$elm_color$Color$scaleFrom255 = function (c) {
-	return c / 255;
-};
-var $avh4$elm_color$Color$rgb255 = F3(
-	function (r, g, b) {
-		return A4(
-			$avh4$elm_color$Color$RgbaSpace,
-			$avh4$elm_color$Color$scaleFrom255(r),
-			$avh4$elm_color$Color$scaleFrom255(g),
-			$avh4$elm_color$Color$scaleFrom255(b),
-			1.0);
-	});
-var $terezka$line_charts$LineChart$Colors$blue = A3($avh4$elm_color$Color$rgb255, 3, 169, 244);
+var $elm$core$Basics$atan = _Basics_atan;
 var $author$project$Vector3$Vector3 = F3(
 	function (x, y, z) {
 		return {aN: x, aO: y, ao: z};
-	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
 	});
 var $author$project$Vector3$map2 = F3(
 	function (f, a, b) {
@@ -11385,6 +11368,7 @@ var $author$project$Vector3$map2 = F3(
 			A2(f, a.aO, b.aO),
 			A2(f, a.ao, b.ao));
 	});
+var $author$project$Vector3$add = $author$project$Vector3$map2($elm$core$Basics$add);
 var $author$project$Vector3$foldl = F3(
 	function (f, inital, _v0) {
 		var x = _v0.aN;
@@ -11403,11 +11387,11 @@ var $author$project$Vector3$dot = F2(
 		return $author$project$Vector3$sumComponents(
 			A3($author$project$Vector3$map2, $elm$core$Basics$mul, a, b));
 	});
-var $author$project$Vector3$lengthSquared = function (a) {
-	return A2($author$project$Vector3$dot, a, a);
-};
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Vector3$length = A2($elm$core$Basics$composeR, $author$project$Vector3$lengthSquared, $elm$core$Basics$sqrt);
+var $author$project$Vector3$subtract = $author$project$Vector3$map2($elm$core$Basics$sub);
+var $author$project$Vector3$rel = F2(
+	function (a, b) {
+		return A2($author$project$Vector3$subtract, b, a);
+	});
 var $author$project$Vector3$map = F2(
 	function (f, _v0) {
 		var x = _v0.aN;
@@ -11423,20 +11407,84 @@ var $author$project$Vector3$scale = function (scaleFactor) {
 	return $author$project$Vector3$map(
 		$elm$core$Basics$mul(scaleFactor));
 };
-var $author$project$Vector3$direction = function (a) {
-	return A2(
-		$author$project$Vector3$scale,
-		1 / $author$project$Vector3$length(a),
-		a);
-};
-var $author$project$PressurePlot$dotVelPressure = F2(
-	function (vel, press) {
-		var vel3 = A3($author$project$Vector3$Vector3, vel.aN, vel.aO, 0);
-		return A2(
+var $author$project$Vector3$pointFromLinePlaneIntersection = F2(
+	function (line, plane) {
+		var decentRate = A2($author$project$Vector3$dot, plane.$7, line.bx);
+		var altitude = A2(
 			$author$project$Vector3$dot,
-			$author$project$Vector3$direction(vel3),
-			$author$project$Vector3$direction(press));
+			plane.$7,
+			A2($author$project$Vector3$rel, line.f$, plane.f$));
+		var t = altitude / decentRate;
+		return (!(!decentRate)) ? $elm$core$Maybe$Just(
+			A2(
+				$author$project$Vector3$add,
+				line.f$,
+				A2($author$project$Vector3$scale, t, line.bx))) : $elm$core$Maybe$Nothing;
 	});
+var $author$project$PenTilt$Cartesian = F3(
+	function (x, y, z) {
+		return {aN: x, aO: y, ao: z};
+	});
+var $elm$core$Basics$cos = _Basics_cos;
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$PenTilt$spherical_to_cartesian = function (_v0) {
+	var r = _v0.bm;
+	var theta = _v0.d$;
+	var phi = _v0.dx;
+	var z = ((-1) * r) * $elm$core$Basics$cos(theta);
+	var l = r * $elm$core$Basics$sin(theta);
+	var x = l * $elm$core$Basics$cos(phi);
+	var y = l * $elm$core$Basics$sin(phi);
+	return A3($author$project$PenTilt$Cartesian, x, y, z);
+};
+var $author$project$Vector3$zero = A3($author$project$Vector3$Vector3, 0, 0, 0);
+var $author$project$PressurePlot$frictionCorrectedPressure = F3(
+	function (mu, v, uncorrectedPressure) {
+		var pressurePlane = A2($author$project$Vector3$Plane, uncorrectedPressure, uncorrectedPressure);
+		var netForceLine = A2(
+			$author$project$Vector3$Line,
+			$author$project$Vector3$zero,
+			$author$project$PenTilt$spherical_to_cartesian(
+				A3(
+					$author$project$PenTilt$Spherical,
+					1,
+					$elm$core$Basics$atan(mu),
+					A2(
+						$author$project$Vector2$angleBetween,
+						A2($author$project$Vector2$Vector2, 1, 0),
+						v))));
+		return A2(
+			$elm$core$Maybe$withDefault,
+			$author$project$Vector3$zero,
+			A2($author$project$Vector3$pointFromLinePlaneIntersection, netForceLine, pressurePlane));
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
+var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
+var $terezka$line_charts$Internal$Line$Series = $elm$core$Basics$identity;
+var $terezka$line_charts$Internal$Line$SeriesConfig = F5(
+	function (color, shape, dashing, label, data) {
+		return {cK: color, cM: dashing, _: data, bc: label, dR: shape};
+	});
+var $terezka$line_charts$Internal$Line$line = F4(
+	function (color_, shape_, label_, data_) {
+		return A5($terezka$line_charts$Internal$Line$SeriesConfig, color_, shape_, _List_Nil, label_, data_);
+	});
+var $terezka$line_charts$LineChart$line = $terezka$line_charts$Internal$Line$line;
+var $terezka$line_charts$Internal$Dots$None = 0;
+var $terezka$line_charts$LineChart$Dots$none = 0;
+var $author$project$PressurePlot$pressureVector3d = function (_v0) {
+	var pressure = _v0.aC;
+	var altitudeAngle = _v0.aq;
+	var azimuthAngle = _v0.ar;
+	return $author$project$PenTilt$spherical_to_cartesian(
+		{dx: azimuthAngle, bm: pressure, d$: ($elm$core$Basics$pi / 2) - altitudeAngle});
+};
+var $author$project$Vector2$add = $author$project$Vector2$map2($elm$core$Basics$add);
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -11458,84 +11506,7 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
-var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
-var $terezka$line_charts$Internal$Line$Series = $elm$core$Basics$identity;
-var $terezka$line_charts$Internal$Line$SeriesConfig = F5(
-	function (color, shape, dashing, label, data) {
-		return {cK: color, cM: dashing, _: data, bc: label, dR: shape};
-	});
-var $terezka$line_charts$Internal$Line$line = F4(
-	function (color_, shape_, label_, data_) {
-		return A5($terezka$line_charts$Internal$Line$SeriesConfig, color_, shape_, _List_Nil, label_, data_);
-	});
-var $terezka$line_charts$LineChart$line = $terezka$line_charts$Internal$Line$line;
-var $terezka$line_charts$Internal$Dots$None = 0;
-var $terezka$line_charts$LineChart$Dots$none = 0;
-var $author$project$PenTilt$Tilt = F3(
-	function (r, tiltX, tiltY) {
-		return {bm: r, d0: tiltX, d1: tiltY};
-	});
-var $elm$core$Basics$degrees = function (angleInDegrees) {
-	return (angleInDegrees * $elm$core$Basics$pi) / 180;
-};
-var $author$project$PenTilt$Cartesian = F3(
-	function (x, y, z) {
-		return {aN: x, aO: y, ao: z};
-	});
-var $elm$core$Basics$cos = _Basics_cos;
-var $author$project$Vector3$cross = F2(
-	function (a, b) {
-		return {aN: (a.aO * b.ao) - (a.ao * b.aO), aO: (a.ao * b.aN) - (a.aN * b.ao), ao: (a.aN * b.aO) - (a.aO * b.aN)};
-	});
-var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$PenTilt$toCartesian = function (_v0) {
-	var r = _v0.bm;
-	var tiltX = _v0.d0;
-	var tiltY = _v0.d1;
-	var py = {
-		aN: 0,
-		aO: (-1) * $elm$core$Basics$cos(tiltY),
-		ao: (-1) * $elm$core$Basics$sin(tiltY)
-	};
-	var px = {
-		aN: (-1) * $elm$core$Basics$cos(tiltX),
-		aO: 0,
-		ao: (-1) * $elm$core$Basics$sin(tiltX)
-	};
-	var _v1 = A2(
-		$author$project$Vector3$scale,
-		r,
-		$author$project$Vector3$direction(
-			A2($author$project$Vector3$cross, py, px)));
-	var x = _v1.aN;
-	var y = _v1.aO;
-	var z = _v1.ao;
-	return A3($author$project$PenTilt$Cartesian, x, y, z);
-};
-var $author$project$PressurePlot$pressureVectorFromTilt = F3(
-	function (pressure, tiltX, tiltY) {
-		return $author$project$PenTilt$toCartesian(
-			A3(
-				$author$project$PenTilt$Tilt,
-				pressure,
-				$elm$core$Basics$degrees(tiltX),
-				$elm$core$Basics$degrees(tiltY)));
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
+var $elm$core$List$map3 = _List_map3;
 var $author$project$Vector2$subtract = $author$project$Vector2$map2($elm$core$Basics$sub);
 var $author$project$Vector2$rel = F2(
 	function (a, b) {
@@ -11552,37 +11523,37 @@ var $author$project$Vector2$scale = function (s) {
 	return $author$project$Vector2$map(
 		$elm$core$Basics$mul(s));
 };
-var $author$project$PressurePlot$velocity = function (eventList) {
-	var timeStamps = A2(
-		$elm$core$List$map,
-		function ($) {
-			return $.aH;
-		},
-		eventList);
-	var t2 = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$head(
-			$elm$core$List$reverse(timeStamps)));
-	var t1 = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$head(timeStamps));
+var $author$project$PressurePlot$velocity2d = function (events) {
 	var p1 = A2(
 		$elm$core$List$map,
 		function (e) {
 			return {aN: e.aD, aO: e.aE};
 		},
-		eventList);
+		events);
 	var p2 = A2($elm$core$List$drop, 1, p1);
-	var dt = (t2 - t1) / $elm$core$List$length(eventList);
-	var displacment = A3($elm$core$List$map2, $author$project$Vector2$rel, p1, p2);
-	return A2(
-		$elm$core$List$map,
-		function (disp) {
-			return A2($author$project$Vector2$scale, 1 / dt, disp);
-		},
-		displacment);
+	var p3 = A2($elm$core$List$drop, 2, p1);
+	var vp2 = A4(
+		$elm$core$List$map3,
+		F3(
+			function (a, b, c) {
+				return A2(
+					$author$project$Vector2$scale,
+					1 / 2,
+					A2(
+						$author$project$Vector2$add,
+						A2($author$project$Vector2$rel, a, b),
+						A2($author$project$Vector2$rel, b, c)));
+			}),
+		p1,
+		p2,
+		p3);
+	var curtaledEvents = $elm$core$List$reverse(
+		A2(
+			$elm$core$List$drop,
+			1,
+			$elm$core$List$reverse(
+				A2($elm$core$List$drop, 1, events))));
+	return _Utils_Tuple2(vp2, curtaledEvents);
 };
 var $terezka$line_charts$Internal$Area$None = {$: 0};
 var $terezka$line_charts$Internal$Area$none = $terezka$line_charts$Internal$Area$None;
@@ -11654,6 +11625,11 @@ var $terezka$line_charts$Internal$Axis$Values$getBeginning = F2(
 		return _Utils_eq(
 			multiple,
 			$elm$core$Basics$round(multiple)) ? min : A2($terezka$line_charts$Internal$Axis$Values$ceilingTo, interval, min);
+	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
 	});
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
@@ -12077,7 +12053,7 @@ var $terezka$line_charts$Internal$Axis$Line$rangeFrame = function (color) {
 		F2(
 			function (data, range) {
 				var smallest = A2($terezka$line_charts$Internal$Coordinate$smallestRange, data, range);
-				return {cK: color, cR: smallest.dh, g: _List_Nil, ck: smallest.bT, aL: 1};
+				return {cK: color, cR: smallest.dh, f: _List_Nil, ck: smallest.bT, aL: 1};
 			}));
 };
 var $terezka$line_charts$Internal$Axis$default = F3(
@@ -12374,7 +12350,7 @@ var $terezka$line_charts$LineChart$defaultConfig = F2(
 			cz: $terezka$line_charts$LineChart$Area$default,
 			a2: $terezka$line_charts$LineChart$Container$default('line-chart-1'),
 			a6: $terezka$line_charts$LineChart$Dots$default,
-			g: $terezka$line_charts$LineChart$Events$default,
+			f: $terezka$line_charts$LineChart$Events$default,
 			fd: $terezka$line_charts$LineChart$Grid$default,
 			c7: $terezka$line_charts$LineChart$Interpolation$default,
 			ae: $terezka$line_charts$LineChart$Axis$Intersection$default,
@@ -12434,7 +12410,7 @@ var $terezka$line_charts$LineChart$chartAreaPlatform = F3(
 						$elm$svg$Svg$Attributes$fill('transparent')
 					]),
 					$terezka$line_charts$LineChart$chartAreaAttributes(system),
-					A3($terezka$line_charts$Internal$Events$toChartAttributes, data, system, config.g)
+					A3($terezka$line_charts$Internal$Events$toChartAttributes, data, system, config.f)
 				]));
 		return A2($elm$svg$Svg$rect, attributes, _List_Nil);
 	});
@@ -13431,6 +13407,15 @@ var $terezka$line_charts$Internal$Svg$anchorStyle = function (anchor) {
 	}();
 	return $elm$svg$Svg$Attributes$style('text-anchor: ' + (anchorString + ';'));
 };
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $terezka$line_charts$Internal$Utils$viewMaybe = F2(
 	function (a, view) {
 		return A2(
@@ -13519,6 +13504,7 @@ var $terezka$line_charts$LineChart$Coordinate$toData = F2(
 			aO: A2($terezka$line_charts$LineChart$Coordinate$toDataY, system, point.aO)
 		};
 	});
+var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $elm$svg$Svg$Attributes$strokeOpacity = _VirtualDom_attribute('stroke-opacity');
 var $terezka$line_charts$Internal$Dots$varietyAttributes = F2(
 	function (color, variety) {
@@ -13692,6 +13678,9 @@ var $terezka$line_charts$Internal$Dots$viewSquare = F5(
 					A2($terezka$line_charts$Internal$Dots$varietyAttributes, color, variety))),
 			_List_Nil);
 	});
+var $elm$core$Basics$degrees = function (angleInDegrees) {
+	return (angleInDegrees * $elm$core$Basics$pi) / 180;
+};
 var $elm$core$Basics$tan = _Basics_tan;
 var $terezka$line_charts$Internal$Dots$pathTriangle = F2(
 	function (area, point) {
@@ -13970,7 +13959,6 @@ var $terezka$line_charts$Internal$Utils$unzip3 = function (pairs) {
 		_Utils_Tuple3(_List_Nil, _List_Nil, _List_Nil),
 		pairs);
 };
-var $elm$core$List$map3 = _List_map3;
 var $terezka$line_charts$Internal$Line$viewNormal = function (_v0) {
 	var areas = _v0.a;
 	var lines = _v0.b;
@@ -14677,7 +14665,7 @@ var $terezka$line_charts$Internal$Axis$Intersection$getY = function (_v0) {
 };
 var $terezka$line_charts$Internal$Axis$attributesLine = F2(
 	function (system, _v0) {
-		var events = _v0.g;
+		var events = _v0.f;
 		var width = _v0.aL;
 		var color = _v0.cK;
 		return _Utils_ap(
@@ -15063,7 +15051,7 @@ var $terezka$line_charts$LineChart$viewCustom = F2(
 						return $.a_;
 					},
 					config.a2),
-					A3($terezka$line_charts$Internal$Events$toContainerAttributes, dataAll, system, config.g),
+					A3($terezka$line_charts$Internal$Events$toContainerAttributes, dataAll, system, config.f),
 					_List_fromArray(
 					[
 						$terezka$line_charts$LineChart$viewBoxAttribute(system)
@@ -15116,6 +15104,167 @@ var $terezka$line_charts$LineChart$view = F2(
 		return $terezka$line_charts$LineChart$viewCustom(
 			A2($terezka$line_charts$LineChart$defaultConfig, toX, toY));
 	});
+var $author$project$PressurePlot$newMeathodChart = function (events) {
+	var _v0 = $author$project$PressurePlot$velocity2d(events);
+	var vel = _v0.a;
+	var trimedEvents = _v0.b;
+	var uncorrPressures = A2($elm$core$List$map, $author$project$PressurePlot$pressureVector3d, trimedEvents);
+	var corrPressures = A3(
+		$elm$core$List$map2,
+		$author$project$PressurePlot$frictionCorrectedPressure(0.05),
+		vel,
+		uncorrPressures);
+	var normalForce = A2(
+		$elm$core$List$map,
+		function ($) {
+			return $.ao;
+		},
+		corrPressures);
+	return $mdgriffith$elm_ui$Element$html(
+		A3(
+			$terezka$line_charts$LineChart$view,
+			function ($) {
+				return $.aN;
+			},
+			function ($) {
+				return $.aO;
+			},
+			_List_fromArray(
+				[
+					A4(
+					$terezka$line_charts$LineChart$line,
+					$terezka$line_charts$LineChart$Colors$blue,
+					$terezka$line_charts$LineChart$Dots$none,
+					'z Press',
+					A2($author$project$PressurePlot$floatIndexedMap, $author$project$PressurePlot$Point, normalForce))
+				])));
+};
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$Pointer$on = F2(
+	function (event, tag) {
+		return A2(
+			$elm$html$Html$Events$on,
+			event,
+			A2($elm$json$Json$Decode$map, tag, $author$project$Pointer$eventDecoder));
+	});
+var $author$project$Pointer$onDown = $author$project$Pointer$on('pointerdown');
+var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 7, a: a, b: b, c: c, d: d, e: e};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
+};
+var $author$project$Vector3$lengthSquared = function (a) {
+	return A2($author$project$Vector3$dot, a, a);
+};
+var $author$project$Vector3$length = A2($elm$core$Basics$composeR, $author$project$Vector3$lengthSquared, $elm$core$Basics$sqrt);
+var $author$project$Vector3$direction = function (a) {
+	return A2(
+		$author$project$Vector3$scale,
+		1 / $author$project$Vector3$length(a),
+		a);
+};
+var $author$project$PressurePlot$dotVelPressure = F2(
+	function (vel, press) {
+		var vel3 = A3($author$project$Vector3$Vector3, vel.aN, vel.aO, 0);
+		return A2(
+			$author$project$Vector3$dot,
+			$author$project$Vector3$direction(vel3),
+			$author$project$Vector3$direction(press));
+	});
+var $author$project$PenTilt$Tilt = F3(
+	function (r, tiltX, tiltY) {
+		return {bm: r, d0: tiltX, d1: tiltY};
+	});
+var $author$project$Vector3$cross = F2(
+	function (a, b) {
+		return {aN: (a.aO * b.ao) - (a.ao * b.aO), aO: (a.ao * b.aN) - (a.aN * b.ao), ao: (a.aN * b.aO) - (a.aO * b.aN)};
+	});
+var $author$project$PenTilt$toCartesian = function (_v0) {
+	var r = _v0.bm;
+	var tiltX = _v0.d0;
+	var tiltY = _v0.d1;
+	var py = {
+		aN: 0,
+		aO: (-1) * $elm$core$Basics$cos(tiltY),
+		ao: (-1) * $elm$core$Basics$sin(tiltY)
+	};
+	var px = {
+		aN: (-1) * $elm$core$Basics$cos(tiltX),
+		aO: 0,
+		ao: (-1) * $elm$core$Basics$sin(tiltX)
+	};
+	var _v1 = A2(
+		$author$project$Vector3$scale,
+		r,
+		$author$project$Vector3$direction(
+			A2($author$project$Vector3$cross, py, px)));
+	var x = _v1.aN;
+	var y = _v1.aO;
+	var z = _v1.ao;
+	return A3($author$project$PenTilt$Cartesian, x, y, z);
+};
+var $author$project$PressurePlot$pressureVectorFromTilt = F3(
+	function (pressure, tiltX, tiltY) {
+		return $author$project$PenTilt$toCartesian(
+			A3(
+				$author$project$PenTilt$Tilt,
+				pressure,
+				$elm$core$Basics$degrees(tiltX),
+				$elm$core$Basics$degrees(tiltY)));
+	});
+var $author$project$PressurePlot$velocity = function (eventList) {
+	var timeStamps = A2(
+		$elm$core$List$map,
+		function ($) {
+			return $.aH;
+		},
+		eventList);
+	var t2 = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$head(
+			$elm$core$List$reverse(timeStamps)));
+	var t1 = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$head(timeStamps));
+	var p1 = A2(
+		$elm$core$List$map,
+		function (e) {
+			return {aN: e.aD, aO: e.aE};
+		},
+		eventList);
+	var p2 = A2($elm$core$List$drop, 1, p1);
+	var dt = (t2 - t1) / $elm$core$List$length(eventList);
+	var displacment = A3($elm$core$List$map2, $author$project$Vector2$rel, p1, p2);
+	return A2(
+		$elm$core$List$map,
+		function (disp) {
+			return A2($author$project$Vector2$scale, 1 / dt, disp);
+		},
+		displacment);
+};
 var $author$project$PressurePlot$pressureOrentationChart = function (model) {
 	var pressureVector = A2(
 		$elm$core$List$drop,
@@ -15125,7 +15274,7 @@ var $author$project$PressurePlot$pressureOrentationChart = function (model) {
 			function (ev) {
 				return A3($author$project$PressurePlot$pressureVectorFromTilt, ev.aC, ev.d0, ev.d1);
 			},
-			model.g));
+			model.f));
 	var pressure = A2(
 		$elm$core$List$drop,
 		1,
@@ -15134,11 +15283,11 @@ var $author$project$PressurePlot$pressureOrentationChart = function (model) {
 			function ($) {
 				return $.aC;
 			},
-			model.g));
+			model.f));
 	var dotProduct = A3(
 		$elm$core$List$map2,
 		$author$project$PressurePlot$dotVelPressure,
-		$author$project$PressurePlot$velocity(model.g),
+		$author$project$PressurePlot$velocity(model.f),
 		pressureVector);
 	var angle = A3(
 		$elm$core$List$map2,
@@ -15153,7 +15302,7 @@ var $author$project$PressurePlot$pressureOrentationChart = function (model) {
 						v));
 			}),
 		pressureVector,
-		$author$project$PressurePlot$velocity(model.g));
+		$author$project$PressurePlot$velocity(model.f));
 	return $mdgriffith$elm_ui$Element$html(
 		A3(
 			$terezka$line_charts$LineChart$view,
@@ -15267,14 +15416,14 @@ var $author$project$PressurePlot$xyChart = function (model) {
 					function (x, y) {
 						return A2($author$project$PressurePlot$Point, x, y.ay);
 					}),
-				model.g),
+				model.f),
 			A2(
 				$elm$core$List$indexedMap,
 				F2(
 					function (x, y) {
 						return A2($author$project$PressurePlot$Point, x, y.az);
 					}),
-				model.g)));
+				model.f)));
 };
 var $author$project$PressurePlot$view = function (model) {
 	return A2(
@@ -15316,7 +15465,8 @@ var $author$project$PressurePlot$view = function (model) {
 					_List_fromArray(
 						[
 							$author$project$PressurePlot$pressureOrentationChart(model),
-							$author$project$PressurePlot$xyChart(model)
+							$author$project$PressurePlot$xyChart(model),
+							$author$project$PressurePlot$newMeathodChart(model.f)
 						]))
 				])));
 };

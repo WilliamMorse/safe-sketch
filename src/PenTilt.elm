@@ -1,4 +1,4 @@
-module PenTilt exposing (Cartesian, Spherical, Tilt, cartesian_to_spherical, fromCartesian, fromSpherical, toCartesian, toSpherical, toVector)
+module PenTilt exposing (Cartesian, Spherical, Tilt, cartesian_to_spherical, fromCartesian, fromSpherical, spherical_to_cartesian, toCartesian, toSpherical, toVector)
 
 import Vector3 as V3
 

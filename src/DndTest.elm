@@ -22,7 +22,9 @@ main =
 
 
 type alias Model =
-    { dragging : Bool, array : Array String }
+    { dragging : Bool
+    , array : Array String
+    }
 
 
 init : Model
@@ -31,8 +33,7 @@ init =
 
 
 type Msg
-    = NoOp
-    | DragStart
+    = DragStart
     | DragEnd
     | Drop
 
@@ -40,9 +41,6 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        NoOp ->
-            model
-
         DragStart ->
             { model | dragging = True }
 

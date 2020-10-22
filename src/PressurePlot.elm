@@ -134,6 +134,7 @@ view model =
             , column [ width fill ]
                 [ pressureOrentationChart model
                 , xyChart model
+                , newMeathodChart model.events
                 ]
             ]
         )
@@ -144,6 +145,98 @@ blockContextMenu msg =
     Html.Events.preventDefaultOn
         "contextmenu"
         (Decode.map (\m -> ( m, True )) (Decode.succeed msg))
+
+
+
+--------------- new code -------------
+
+
+pressureVector3d : Event -> Vector3
+pressureVector3d { pressure, altitudeAngle, azimuthAngle } =
+    { r = pressure
+    , theta = (pi / 2) - altitudeAngle
+    , phi = azimuthAngle
+    }
+        |> PenTilt.spherical_to_cartesian
+
+
+{-| gives back a list of truncated events because the velocity sampling happens between datapoints.
+The coalesced events come in reagularly (more so than the timestamps that they are labled with) so the base unit of time is the time between move events.
+-}
+velocity2d : List Event -> ( List Vector2, List Event )
+velocity2d events =
+    let
+        p1 =
+            List.map (\e -> { x = e.screenX, y = e.screenY }) events
+
+        p2 =
+            List.drop 1 p1
+
+        p3 =
+            List.drop 2 p1
+
+        vp2 =
+            List.map3
+                (\a b c ->
+                    Vector2.add (Vector2.rel a b) (Vector2.rel b c)
+                        |> Vector2.scale (1 / 2)
+                )
+                p1
+                p2
+                p3
+
+        curtaledEvents =
+            List.drop 1 events |> List.reverse |> List.drop 1 |> List.reverse
+    in
+    ( vp2, curtaledEvents )
+
+
+frictionCorrectedPressure : Float -> Vector2 -> Vector3 -> Vector3
+frictionCorrectedPressure mu v uncorrectedPressure =
+    let
+        -- plane representing all possible net pressure vectors from the pressure sensor
+        pressurePlane =
+            Vector3.Plane uncorrectedPressure uncorrectedPressure
+
+        -- line that is in the direction specified by the coefecent of friction cone and the velocity vector
+        netForceLine =
+            Vector3.Line Vector3.zero
+                (PenTilt.spherical_to_cartesian
+                    (PenTilt.Spherical 1 (atan mu) (Vector2.angleBetween (Vector2 1 0) v))
+                )
+    in
+    Maybe.withDefault Vector3.zero
+        (Vector3.pointFromLinePlaneIntersection netForceLine pressurePlane)
+
+
+newMeathodChart : List Event -> Element msg
+newMeathodChart events =
+    let
+        ( vel, trimedEvents ) =
+            velocity2d events
+
+        uncorrPressures =
+            List.map pressureVector3d trimedEvents
+
+        corrPressures =
+            List.map2 (frictionCorrectedPressure 0.05) vel uncorrPressures
+
+        normalForce =
+            corrPressures |> List.map .z
+    in
+    html <|
+        LineChart.view
+            .x
+            .y
+            [ LineChart.line Colors.blue
+                Dots.none
+                "z Press"
+                (floatIndexedMap Point normalForce)
+            ]
+
+
+
+--------------- new code above -------
 
 
 rawPressure : Float -> Int -> Int -> Vector3
@@ -240,11 +333,6 @@ pressureChart model =
                 (\x y -> Point (toFloat x) y.pressure)
                 model.events
             )
-
-
-square : Float -> Float
-square n =
-    n * n
 
 
 velocityChart : Model -> Element msg
