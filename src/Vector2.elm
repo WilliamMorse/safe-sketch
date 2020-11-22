@@ -45,6 +45,11 @@ add =
     map2 (+)
 
 
+negate : Vector2 -> Vector2
+negate =
+    map (\c -> -c)
+
+
 subtract : Vector2 -> Vector2 -> Vector2
 subtract =
     map2 (-)

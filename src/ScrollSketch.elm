@@ -18,7 +18,6 @@ import Pointer exposing (DeviceType, Event, blockContextMenu, eventDecoder, onDo
 import Svg as S exposing (Svg)
 import Svg.Attributes as Sa
 import Svg.Keyed as Keyed
-import Svg.Lazy as So
 import Task
 
 

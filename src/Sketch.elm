@@ -1,4 +1,4 @@
-port module Sketch exposing (..)
+port module Sketch exposing (main)
 
 import Browser
 import Browser.Dom
@@ -13,6 +13,7 @@ import Json.Encode as Encode
 import Pointer exposing (DeviceType, Event, blockContextMenu, eventDecoder, onDown, onUp)
 import Svg as S exposing (Svg)
 import Svg.Attributes as Sa
+import Svg.Keyed
 import Svg.Lazy as So
 import Task
 
@@ -51,7 +52,7 @@ init =
       , pointerDown = False
       , currentStroke = []
       , predictedStroke = []
-      , strokes = []
+      , strokes = [ [ ( 100, 100 ), ( 200, 200 ) ] ]
       , viewportHeight = 30
       , viewportWidth = 30
       }
@@ -76,16 +77,6 @@ subscriptions _ =
         ]
 
 
-unpackEvents : Value -> List Event
-unpackEvents ev =
-    case Decode.decodeValue (Decode.list eventDecoder) ev of
-        Ok evl ->
-            evl
-
-        Err _ ->
-            []
-
-
 type alias EventBundle =
     { events : List Event
     , predictions : List Event
@@ -99,6 +90,11 @@ decodeBundle =
         (Decode.field "predictions" (Decode.list eventDecoder))
 
 
+getOffset : Event -> Point
+getOffset { offsetX, offsetY } =
+    ( offsetX, offsetY )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -110,7 +106,7 @@ update msg model =
                 ( { model
                     | pointerDown = True
                     , inputType = event.pointerType
-                    , currentStroke = List.append model.currentStroke [ ( event.offsetX, event.offsetY ) ]
+                    , currentStroke = [ getOffset event ]
                   }
                 , Cmd.none
                 )
@@ -122,17 +118,14 @@ update msg model =
             case Decode.decodeValue decodeBundle bundeledEvent of
                 Ok evb ->
                     case evb.events of
-                        event :: restOfEvents ->
+                        event :: _ ->
                             ( { model
                                 | inputType = event.pointerType
                                 , currentStroke =
-                                    event
-                                        :: restOfEvents
-                                        |> List.map (\e -> ( e.offsetX, e.offsetY ))
-                                        |> List.append model.currentStroke
+                                    model.currentStroke
+                                        ++ List.map getOffset evb.events
                                 , predictedStroke =
-                                    evb.predictions
-                                        |> List.map (\e -> ( e.offsetX, e.offsetY ))
+                                    List.map getOffset evb.predictions
                               }
                             , Cmd.none
                             )
@@ -146,7 +139,6 @@ update msg model =
         Up event ->
             if event.pointerType == Pointer.Pen then
                 ( { model
-                    -- Now that we have render time, update the view with the denser stroke points
                     | strokes =
                         model.strokes
                             ++ [ model.currentStroke
@@ -198,7 +190,7 @@ view model =
                 , htmlAttribute <| Pointer.onUp Up
                 , htmlAttribute <| blockContextMenu NoOp
                 ]
-                (html <| So.lazy svgSketchSpace model)
+                (html <| svgSketchSpace model)
             ]
 
 
@@ -213,11 +205,33 @@ svgPoint ( x, y ) =
         []
 
 
+svgLine : Point -> Point -> S.Svg Msg
+svgLine a b =
+    --Debug.log "Line"
+    S.line
+        [ Sa.x1 <| String.fromFloat <| Tuple.first a
+        , Sa.y1 <| String.fromFloat <| Tuple.second a
+        , Sa.x2 <| String.fromFloat <| Tuple.first b
+        , Sa.y2 <| String.fromFloat <| Tuple.second b
+        , Sa.stroke "Black"
+        , Sa.strokeWidth "2"
+        ]
+        []
+
+
+svgLines : List Point -> List (Svg Msg)
+svgLines p1 =
+    let
+        p2 =
+            p1 |> List.drop 1
+    in
+    List.map2 (So.lazy2 svgLine) p1 p2
+
+
 pointToString : Point -> String
 pointToString ( x, y ) =
-    String.append
-        (String.fromFloat x ++ ",")
-        (String.fromFloat y ++ " ")
+    (String.fromFloat x |> String.cons ' ')
+        ++ (String.fromFloat y |> String.cons ',')
 
 
 svgPolylineStringFromPoints : List Point -> String
@@ -229,6 +243,7 @@ svgPolylineStringFromPoints points =
 
 stroke : List Point -> S.Svg Msg
 stroke points =
+    --Debug.log "Stroke"
     S.polyline
         [ Sa.fill "none"
         , Sa.stroke "black"
@@ -240,13 +255,13 @@ stroke points =
         []
 
 
-velocityVectors : List Point -> List Point
-velocityVectors points =
+packStroke : Int -> List Point -> ( String, Svg Msg )
+packStroke i s =
     let
-        p0 =
-            List.drop 1 points
+        str =
+            "stroke" ++ String.fromInt i
     in
-    p0
+    ( str, So.lazy stroke s )
 
 
 svgSketchSpace : Model -> Svg Msg
@@ -258,7 +273,7 @@ svgSketchSpace model =
         height =
             String.fromFloat <| model.viewportHeight - 30
     in
-    S.svg
+    Svg.Keyed.node "svg"
         [ Sa.width width
         , Sa.height height
         , Sa.viewBox <|
@@ -272,8 +287,11 @@ svgSketchSpace model =
                 ++ height
         , Sa.id "sketchspace"
         ]
-        (List.concat
-            [ List.map stroke model.strokes
-            , [ stroke <| model.currentStroke ++ model.predictedStroke ]
-            ]
+    <|
+        ( "current"
+        , stroke <|
+            model.currentStroke
+                ++ model.predictedStroke
         )
+            :: List.indexedMap packStroke
+                model.strokes

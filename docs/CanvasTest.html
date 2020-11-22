@@ -1,0 +1,56 @@
+<style>
+  /* Disable intrinsic user agent touch behaviors (such as panning or zooming) so
+  that all events on the canvas element are given to the application instead. */
+
+  canvas { touch-action: none; }
+</style>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <script type="text/javascript">
+
+            
+            function penDown(x, y) {
+                var canvas = document.getElementById("paper");
+                var ctx = canvas.getContext("2d");
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+
+
+            function drawTo(x, y) {
+                var canvas = document.getElementById("paper");
+                var ctx = canvas.getContext("2d");
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+
+
+            function downEventHandeler(event) {
+                if (event.pointerType == "pen") {
+                    penDown(event.offsetX, event.offsetY);
+                }
+            }
+
+
+            function moveEventHandeler(event) {
+                if (event.pointerType == "pen") {
+                    var events = event.getCoalescedEvents();
+                    drawTo(event.offsetX, event.offsetY);
+                }
+            }
+
+
+            document.addEventListener("DOMContentLoaded", function () { console.log("DOMLoaded")
+                var can = document.getElementById("paper");
+                can.addEventListener("pointerdown", downEventHandeler);
+                can.addEventListener("pointermove", moveEventHandeler);
+                can.addEventListener("pointerup", moveEventHandeler);
+            });
+        </script>
+    </head>
+    <body> 
+        <canvas id="paper" width="500px" height="500px"> </canvas>
+    </body>
+</html>
+

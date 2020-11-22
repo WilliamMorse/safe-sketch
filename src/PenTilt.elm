@@ -111,7 +111,7 @@ spherical_to_cartesian { r, theta, phi } =
             l * sin phi
 
         z =
-            -1 * r * cos theta
+            r * cos theta
     in
     Cartesian x y z
 

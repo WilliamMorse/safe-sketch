@@ -133,8 +133,8 @@ view model =
             [ text "Pen Info Charts"
             , column [ width fill ]
                 [ pressureOrentationChart model
-                , xyChart model
                 , newMeathodChart model.events
+                , velocityChart model
                 ]
             ]
         )
@@ -202,7 +202,7 @@ frictionCorrectedPressure mu v uncorrectedPressure =
         netForceLine =
             Vector3.Line Vector3.zero
                 (PenTilt.spherical_to_cartesian
-                    (PenTilt.Spherical 1 (atan mu) (Vector2.angleBetween (Vector2 1 0) v))
+                    (PenTilt.Spherical 1 (atan mu) (Vector2.angleBetween (Vector2 1 0) (Vector2.negate v)))
                 )
     in
     Maybe.withDefault Vector3.zero
@@ -212,17 +212,17 @@ frictionCorrectedPressure mu v uncorrectedPressure =
 newMeathodChart : List Event -> Element msg
 newMeathodChart events =
     let
-        ( vel, trimedEvents ) =
+        ( vel, trimmedEvents ) =
             velocity2d events
 
         uncorrPressures =
-            List.map pressureVector3d trimedEvents
+            List.map pressureVector3d trimmedEvents
 
         corrPressures =
-            List.map2 (frictionCorrectedPressure 0.05) vel uncorrPressures
+            List.map2 (frictionCorrectedPressure 0.3) vel uncorrPressures
 
-        normalForce =
-            corrPressures |> List.map .z
+        netforce =
+            corrPressures |> List.map Vector3.length
     in
     html <|
         LineChart.view
@@ -230,8 +230,16 @@ newMeathodChart events =
             .y
             [ LineChart.line Colors.blue
                 Dots.none
-                "z Press"
-                (floatIndexedMap Point normalForce)
+                "net force"
+                (floatIndexedMap Point netforce)
+            , LineChart.line Colors.green
+                Dots.none
+                "vel mag"
+                (floatIndexedMap (\i v -> Point i (Vector2.length v / 10)) vel)
+            , LineChart.line Colors.red
+                Dots.none
+                "raw p"
+                (floatIndexedMap (\i ev -> Point i ev.pressure) trimmedEvents)
             ]
 
 
@@ -346,6 +354,8 @@ velocityChart model =
                 "vel"
                 (List.indexedMap
                     (\x y -> Point (toFloat x) y)
+                    -- timestamps are still wobbely
+                    --(List.map .timeStamp model.events)
                     (List.map Vector2.length (velocity model.events))
                 )
             ]
@@ -513,8 +523,9 @@ velocity eventList =
 
         t2 =
             Maybe.withDefault 0 <|
-                List.head <|
-                    List.reverse timeStamps
+                (List.reverse timeStamps
+                    |> List.head
+                )
 
         p1 =
             List.map (\e -> { x = e.screenX, y = e.screenY }) eventList
