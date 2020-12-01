@@ -10908,7 +10908,7 @@ var $author$project$Pointer$eventDecoder = A3(
 																			$author$project$Pointer$defaultEvent.pointerId,
 																			A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$int),
 																			$elm$json$Json$Decode$succeed($author$project$Pointer$Event))))))))))))))))))));
-var $author$project$Sketch$decodeBundle = A3(
+var $author$project$Sketch$bundleDecoder = A3(
 	$elm$json$Json$Decode$map2,
 	$author$project$Sketch$EventBundle,
 	A2(
@@ -10946,7 +10946,7 @@ var $author$project$Sketch$update = F2(
 				var bundeledEvent = msg.a;
 				return _Utils_Tuple2(
 					function () {
-						var _v1 = A2($elm$json$Json$Decode$decodeValue, $author$project$Sketch$decodeBundle, bundeledEvent);
+						var _v1 = A2($elm$json$Json$Decode$decodeValue, $author$project$Sketch$bundleDecoder, bundeledEvent);
 						if (_v1.$ === 'Ok') {
 							var evb = _v1.a;
 							return _Utils_update(
@@ -10954,12 +10954,12 @@ var $author$project$Sketch$update = F2(
 								{
 									currentStroke: A3(
 										$elm$core$List$foldl,
-										A2($elm$core$Basics$composeL, $elm$core$List$cons, $author$project$Sketch$getOffset),
+										A2($elm$core$Basics$composeR, $author$project$Sketch$getOffset, $elm$core$List$cons),
 										model.currentStroke,
 										evb.events),
 									predictedStroke: A3(
 										$elm$core$List$foldl,
-										A2($elm$core$Basics$composeL, $elm$core$List$cons, $author$project$Sketch$getOffset),
+										A2($elm$core$Basics$composeR, $author$project$Sketch$getOffset, $elm$core$List$cons),
 										_List_Nil,
 										evb.predictions)
 								});
@@ -11001,7 +11001,7 @@ var $author$project$Sketch$update = F2(
 					_Utils_update(
 						model,
 						{viewportHeight: h, viewportWidth: w}),
-					$elm$core$Platform$Cmd$none);
+					A2($elm$core$Task$perform, $author$project$Sketch$UpdateViewport, $elm$browser$Browser$Dom$getViewport));
 		}
 	});
 var $author$project$Sketch$Down = function (a) {
@@ -16679,7 +16679,6 @@ var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$svg$Svg$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$Debug$log = _Debug_log;
 var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
@@ -16687,29 +16686,17 @@ var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
 var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $elm$core$String$cons = _String_cons;
 var $author$project$Sketch$pointToString = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
-	return _Utils_ap(
-		A2(
-			$elm$core$String$cons,
-			_Utils_chr(' '),
-			$elm$core$String$fromFloat(x)),
-		A2(
-			$elm$core$String$cons,
-			_Utils_chr(','),
-			$elm$core$String$fromFloat(y)));
+	return ' ' + ($elm$core$String$fromFloat(x) + (',' + $elm$core$String$fromFloat(y)));
 };
 var $author$project$Sketch$svgPolylineStringFromPoints = function (points) {
 	return $elm$core$String$concat(
 		A2($elm$core$List$map, $author$project$Sketch$pointToString, points));
 };
 var $author$project$Sketch$polyline = function (points) {
-	return A4(
-		$elm$core$Debug$log,
-		$elm$core$String$fromInt(
-			$elm$core$List$length(points)),
+	return A2(
 		$elm$svg$Svg$polyline,
 		_List_fromArray(
 			[
@@ -16741,9 +16728,9 @@ var $author$project$Sketch$svgSketchSpace = function (model) {
 		A3(
 			$elm$core$List$foldl,
 			A2(
-				$elm$core$Basics$composeL,
-				$elm$core$List$cons,
-				$elm$svg$Svg$Lazy$lazy($author$project$Sketch$polyline)),
+				$elm$core$Basics$composeR,
+				$elm$svg$Svg$Lazy$lazy($author$project$Sketch$polyline),
+				$elm$core$List$cons),
 			_List_Nil,
 			A2(
 				$elm$core$List$cons,

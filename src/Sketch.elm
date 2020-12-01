@@ -2,18 +2,30 @@ port module Sketch exposing (main)
 
 import Browser
 import Browser.Dom
-import Browser.Events as Be
-import Element exposing (centerX, centerY, column, el, fill, height, html, htmlAttribute, width)
+import Browser.Events
+import Element
+    exposing
+        ( centerX
+        , centerY
+        , column
+        , el
+        , fill
+        , height
+        , html
+        , htmlAttribute
+        , layout
+        , width
+        )
 import Element.Border as Border
 import Html exposing (Html)
 import Html.Attributes
 import Html.Lazy
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Encode as Encode
-import Pointer exposing (Event, blockContextMenu, eventDecoder, onDown, onUp)
-import Svg as S exposing (Svg)
+import Pointer
+import Svg exposing (Svg)
 import Svg.Attributes as Sa
-import Svg.Lazy as So
+import Svg.Lazy
 import Task
 
 
@@ -55,6 +67,22 @@ init =
     )
 
 
+
+-- Subscriptions --
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.batch
+        [ Browser.Events.onResize WindowResize
+        , penMoveEvent Move
+        ]
+
+
+
+-- Update --
+
+
 type Msg
     = NoOp
     | Down Pointer.Event
@@ -64,28 +92,20 @@ type Msg
     | WindowResize Int Int
 
 
-subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch
-        [ Be.onResize WindowResize
-        , penMoveEvent Move
-        ]
-
-
 type alias EventBundle =
-    { events : List Event
-    , predictions : List Event
+    { events : List Pointer.Event
+    , predictions : List Pointer.Event
     }
 
 
-decodeBundle : Decoder EventBundle
-decodeBundle =
+bundleDecoder : Decoder EventBundle
+bundleDecoder =
     Decode.map2 EventBundle
-        (Decode.field "events" (Decode.list eventDecoder))
-        (Decode.field "predictions" (Decode.list eventDecoder))
+        (Decode.field "events" (Decode.list Pointer.eventDecoder))
+        (Decode.field "predictions" (Decode.list Pointer.eventDecoder))
 
 
-getOffset : Event -> Point
+getOffset : Pointer.Event -> Point
 getOffset { offsetX, offsetY } =
     ( offsetX, offsetY )
 
@@ -98,6 +118,7 @@ update msg model =
 
         Down event ->
             ( if event.pointerType == Pointer.Pen then
+                -- Use two copies of the event to render the first line segment
                 { model | currentStroke = [ getOffset event, getOffset event ] }
 
               else
@@ -106,7 +127,7 @@ update msg model =
             )
 
         Move bundeledEvent ->
-            ( case Decode.decodeValue decodeBundle bundeledEvent of
+            ( case Decode.decodeValue bundleDecoder bundeledEvent of
                 Ok evb ->
                     { model
                         | currentStroke =
@@ -128,7 +149,8 @@ update msg model =
             ( if event.pointerType == Pointer.Pen then
                 { model
                     | strokes =
-                        (getOffset event :: model.currentStroke) :: model.strokes
+                        (getOffset event :: model.currentStroke)
+                            :: model.strokes
                     , currentStroke = []
                     , predictedStroke = []
                 }
@@ -154,57 +176,13 @@ update msg model =
             )
 
 
-view : Model -> Html Msg
-view model =
-    Element.layout
-        [ width fill
-        , height fill
-        , htmlAttribute <| Html.Attributes.style "touch-action" "none"
-        , htmlAttribute <| Html.Attributes.style "user-select" "none"
-        ]
-    <|
-        column
-            [ centerX
-            , centerY
-            ]
-            [ el
-                [ width fill
-                , height fill
-                , Border.width 3
-                , htmlAttribute <| Pointer.onDown Down
-                , htmlAttribute <| Pointer.onUp Up
-                , htmlAttribute <| blockContextMenu NoOp
-                ]
-                (html <| svgSketchSpace model)
-            ]
 
-
-svgLine : Point -> Point -> S.Svg Msg
-svgLine a b =
-    S.line
-        [ Sa.x1 <| String.fromFloat <| Tuple.first a
-        , Sa.y1 <| String.fromFloat <| Tuple.second a
-        , Sa.x2 <| String.fromFloat <| Tuple.first b
-        , Sa.y2 <| String.fromFloat <| Tuple.second b
-        , Sa.stroke "black"
-        , Sa.strokeWidth "2"
-        ]
-        []
-
-
-svgLines : List Point -> List (Svg Msg)
-svgLines p1 =
-    let
-        p2 =
-            p1 |> List.drop 1
-    in
-    List.map2 (So.lazy2 svgLine) p1 p2
+-- View --
 
 
 pointToString : Point -> String
 pointToString ( x, y ) =
-    (String.fromFloat x |> String.cons ' ')
-        ++ (String.fromFloat y |> String.cons ',')
+    " " ++ String.fromFloat x ++ "," ++ String.fromFloat y
 
 
 svgPolylineStringFromPoints : List Point -> String
@@ -214,9 +192,9 @@ svgPolylineStringFromPoints points =
         |> String.concat
 
 
-polyline : List Point -> S.Svg Msg
+polyline : List Point -> Svg Msg
 polyline points =
-    S.polyline
+    Svg.polyline
         [ Sa.fill "none"
         , Sa.stroke "darkGrey"
         , Sa.strokeWidth "10"
@@ -236,13 +214,38 @@ svgSketchSpace model =
         height =
             String.fromFloat <| model.viewportHeight - 30
     in
-    S.svg
+    Svg.svg
         [ Sa.width width
         , Sa.height height
         , Sa.viewBox <| "0 0 " ++ width ++ " " ++ height
         , Sa.id "sketchspace"
         ]
     <|
-        List.foldl (So.lazy polyline >> (::)) [] <|
+        List.foldl (Svg.Lazy.lazy polyline >> (::)) [] <|
             (model.predictedStroke ++ model.currentStroke)
                 :: model.strokes
+
+
+view : Model -> Html Msg
+view model =
+    layout
+        [ width fill
+        , height fill
+        , htmlAttribute <| Html.Attributes.style "touch-action" "none"
+        , htmlAttribute <| Html.Attributes.style "user-select" "none"
+        ]
+    <|
+        column
+            [ centerX
+            , centerY
+            ]
+            [ el
+                [ width fill
+                , height fill
+                , Border.width 3
+                , htmlAttribute <| Pointer.onDown Down
+                , htmlAttribute <| Pointer.onUp Up
+                , htmlAttribute <| Pointer.blockContextMenu NoOp
+                ]
+                (html <| svgSketchSpace model)
+            ]
