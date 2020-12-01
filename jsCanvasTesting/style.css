@@ -1,0 +1,15 @@
+#canvasOne {
+    touch-action: none;
+    height: calc(100vh - 16px);
+    width: calc(100vw - 16px);
+    border: 2px solid black;
+    position: absolute;
+    left: 50%; /* relative to nearest positioned ancestor or body element */
+    top: 50%; /*  relative to nearest positioned ancestor or body element */
+    transform: translate(-50%, -50%); /* relative to element's height & width */
+}
+/*
+body {
+    overflow: hidden;
+}
+*/

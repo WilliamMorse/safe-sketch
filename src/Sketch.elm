@@ -10,10 +10,9 @@ import Html.Attributes
 import Html.Lazy
 import Json.Decode as Decode exposing (Decoder, Value)
 import Json.Encode as Encode
-import Pointer exposing (DeviceType, Event, blockContextMenu, eventDecoder, onDown, onUp)
+import Pointer exposing (Event, blockContextMenu, eventDecoder, onDown, onUp)
 import Svg as S exposing (Svg)
 import Svg.Attributes as Sa
-import Svg.Keyed
 import Svg.Lazy as So
 import Task
 
@@ -36,9 +35,7 @@ type alias Point =
 
 
 type alias Model =
-    { inputType : DeviceType
-    , pointerDown : Bool
-    , currentStroke : List Point
+    { currentStroke : List Point
     , predictedStroke : List Point
     , strokes : List (List Point)
     , viewportHeight : Float
@@ -48,11 +45,9 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { inputType = Pointer.Pen
-      , pointerDown = False
-      , currentStroke = []
+    ( { currentStroke = []
       , predictedStroke = []
-      , strokes = [ [ ( 100, 100 ), ( 200, 200 ) ] ]
+      , strokes = []
       , viewportHeight = 30
       , viewportWidth = 30
       }
@@ -102,58 +97,46 @@ update msg model =
             ( model, Cmd.none )
 
         Down event ->
-            if event.pointerType == Pointer.Pen then
-                ( { model
-                    | pointerDown = True
-                    , inputType = event.pointerType
-                    , currentStroke = [ getOffset event ]
-                  }
-                , Cmd.none
-                )
+            ( if event.pointerType == Pointer.Pen then
+                { model | currentStroke = [ getOffset event, getOffset event ] }
 
-            else
-                ( model, Cmd.none )
+              else
+                model
+            , Cmd.none
+            )
 
         Move bundeledEvent ->
-            case Decode.decodeValue decodeBundle bundeledEvent of
+            ( case Decode.decodeValue decodeBundle bundeledEvent of
                 Ok evb ->
-                    case evb.events of
-                        event :: _ ->
-                            ( { model
-                                | inputType = event.pointerType
-                                , currentStroke =
-                                    model.currentStroke
-                                        ++ List.map getOffset evb.events
-                                , predictedStroke =
-                                    List.map getOffset evb.predictions
-                              }
-                            , Cmd.none
-                            )
-
-                        [] ->
-                            ( model, Cmd.none )
+                    { model
+                        | currentStroke =
+                            List.foldl (getOffset >> (::))
+                                model.currentStroke
+                                evb.events
+                        , predictedStroke =
+                            List.foldl (getOffset >> (::))
+                                []
+                                evb.predictions
+                    }
 
                 Err _ ->
-                    ( model, Cmd.none )
+                    model
+            , Cmd.none
+            )
 
         Up event ->
-            if event.pointerType == Pointer.Pen then
-                ( { model
+            ( if event.pointerType == Pointer.Pen then
+                { model
                     | strokes =
-                        model.strokes
-                            ++ [ model.currentStroke
-                                    ++ [ ( event.offsetX, event.offsetY ) ]
-                               ]
+                        (getOffset event :: model.currentStroke) :: model.strokes
                     , currentStroke = []
                     , predictedStroke = []
-                    , pointerDown = False
-                    , inputType = event.pointerType
-                  }
-                , Cmd.none
-                )
+                }
 
-            else
-                ( model, Cmd.none )
+              else
+                model
+            , Cmd.none
+            )
 
         UpdateViewport vp ->
             let
@@ -166,7 +149,9 @@ update msg model =
             ( { model | viewportWidth = w, viewportHeight = h }, Cmd.none )
 
         WindowResize w h ->
-            ( { model | viewportWidth = toFloat w, viewportHeight = toFloat h }, Cmd.none )
+            ( { model | viewportWidth = toFloat w, viewportHeight = toFloat h }
+            , Task.perform UpdateViewport Browser.Dom.getViewport
+            )
 
 
 view : Model -> Html Msg
@@ -194,26 +179,14 @@ view model =
             ]
 
 
-svgPoint : Point -> S.Svg Msg
-svgPoint ( x, y ) =
-    S.circle
-        [ Sa.cx <| String.fromFloat x
-        , Sa.cy <| String.fromFloat y
-        , Sa.r "2"
-        , Sa.fill "red"
-        ]
-        []
-
-
 svgLine : Point -> Point -> S.Svg Msg
 svgLine a b =
-    --Debug.log "Line"
     S.line
         [ Sa.x1 <| String.fromFloat <| Tuple.first a
         , Sa.y1 <| String.fromFloat <| Tuple.second a
         , Sa.x2 <| String.fromFloat <| Tuple.first b
         , Sa.y2 <| String.fromFloat <| Tuple.second b
-        , Sa.stroke "Black"
+        , Sa.stroke "black"
         , Sa.strokeWidth "2"
         ]
         []
@@ -241,27 +214,17 @@ svgPolylineStringFromPoints points =
         |> String.concat
 
 
-stroke : List Point -> S.Svg Msg
-stroke points =
-    --Debug.log "Stroke"
+polyline : List Point -> S.Svg Msg
+polyline points =
     S.polyline
         [ Sa.fill "none"
-        , Sa.stroke "black"
-        , Sa.strokeWidth "2"
+        , Sa.stroke "darkGrey"
+        , Sa.strokeWidth "10"
         , Sa.strokeLinecap "round"
         , Sa.strokeLinejoin "round"
         , Sa.points (svgPolylineStringFromPoints points)
         ]
         []
-
-
-packStroke : Int -> List Point -> ( String, Svg Msg )
-packStroke i s =
-    let
-        str =
-            "stroke" ++ String.fromInt i
-    in
-    ( str, So.lazy stroke s )
 
 
 svgSketchSpace : Model -> Svg Msg
@@ -273,25 +236,13 @@ svgSketchSpace model =
         height =
             String.fromFloat <| model.viewportHeight - 30
     in
-    Svg.Keyed.node "svg"
+    S.svg
         [ Sa.width width
         , Sa.height height
-        , Sa.viewBox <|
-            ""
-                ++ "0"
-                ++ " "
-                ++ "0"
-                ++ " "
-                ++ width
-                ++ " "
-                ++ height
+        , Sa.viewBox <| "0 0 " ++ width ++ " " ++ height
         , Sa.id "sketchspace"
         ]
     <|
-        ( "current"
-        , stroke <|
-            model.currentStroke
-                ++ model.predictedStroke
-        )
-            :: List.indexedMap packStroke
-                model.strokes
+        List.foldl (So.lazy polyline >> (::)) [] <|
+            (model.predictedStroke ++ model.currentStroke)
+                :: model.strokes
