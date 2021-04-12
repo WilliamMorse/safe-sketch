@@ -92,6 +92,11 @@ type Msg
     | WindowResize Int Int
 
 
+getOffset : Pointer.Event -> Point
+getOffset { offsetX, offsetY } =
+    ( offsetX, offsetY )
+
+
 type alias EventBundle =
     { events : List Pointer.Event
     , predictions : List Pointer.Event
@@ -105,9 +110,18 @@ bundleDecoder =
         (Decode.field "predictions" (Decode.list Pointer.eventDecoder))
 
 
-getOffset : Pointer.Event -> Point
-getOffset { offsetX, offsetY } =
-    ( offsetX, offsetY )
+updateCurrentStroke : Model -> EventBundle -> Model
+updateCurrentStroke model eventBundle =
+    { model
+        | currentStroke =
+            List.foldl (getOffset >> (::))
+                model.currentStroke
+                eventBundle.events
+        , predictedStroke =
+            List.foldl (getOffset >> (::))
+                []
+                eventBundle.predictions
+    }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -127,21 +141,9 @@ update msg model =
             )
 
         Move bundeledEvent ->
-            ( case Decode.decodeValue bundleDecoder bundeledEvent of
-                Ok evb ->
-                    { model
-                        | currentStroke =
-                            List.foldl (getOffset >> (::))
-                                model.currentStroke
-                                evb.events
-                        , predictedStroke =
-                            List.foldl (getOffset >> (::))
-                                []
-                                evb.predictions
-                    }
-
-                Err _ ->
-                    model
+            ( Decode.decodeValue bundleDecoder bundeledEvent
+                |> Result.map (updateCurrentStroke model)
+                |> Result.withDefault model
             , Cmd.none
             )
 
